@@ -15,8 +15,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Local Storage Setup
-// Local Storage Setup
-const RECORDINGS_DIR = path.join(process.env.tmpdir || '/tmp', 'recordings'); // Use /tmp for serverless (ephemeral) or fall back
+const RECORDINGS_DIR = process.env.VERCEL ? path.join(process.env.tmpdir || '/tmp', 'recordings') : path.join(__dirname, 'recordings');
+
 // In serverless, we might not have permission to write to __dirname or it might be read-only.
 // We should only attempt to create dirs if we are NOT in a read-only env, or accept it might fail.
 
