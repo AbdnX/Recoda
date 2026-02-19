@@ -432,4 +432,7 @@ if (require.main === module) {
 }
 
 // Export for Vercel
-module.exports = app;
+// Export for Vercel - explicit handler wrapper
+module.exports = (req, res) => {
+  app(req, res);
+};
