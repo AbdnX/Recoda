@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "build": "echo 'No build step required'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
