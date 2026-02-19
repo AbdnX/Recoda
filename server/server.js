@@ -68,12 +68,18 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRole) {
 }
 
 // Create Admin Client for bypassing RLS on storage ops
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRole, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+let supabaseAdmin = null;
+
+if (supabaseUrl && supabaseServiceRole) {
+  supabaseAdmin = createClient(supabaseUrl, supabaseServiceRole, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+} else {
+  console.warn('⚠️  Supabase Admin Client not initialized (missing config)');
+}
 
 /**
  * Auth Middleware
@@ -90,6 +96,10 @@ const requireAuth = async (req, res, next) => {
   const token = authHeader.replace('Bearer ', '');
   
   // Create a client instance scoped to this user's token
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return res.status(500).json({ error: 'Server authentication not configured' });
+  }
+
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: {
@@ -230,14 +240,19 @@ app.post('/api/recordings/sync', requireAuth, async (req, res) => {
     const toDownload = [];
     for (const rec of missingInLocal) {
       // Generate signed URL for download (valid for 1 hour) using Admin Client
-      const path = `${req.user.id}/${rec.filename}`;
-      const { data: urlData } = await supabaseAdmin.storage
-        .from('recordings')
-        .createSignedUrl(path, 3600);
+      let downloadUrl = null;
+      
+      if (supabaseAdmin) {
+        const path = `${req.user.id}/${rec.filename}`;
+        const { data: urlData } = await supabaseAdmin.storage
+          .from('recordings')
+          .createSignedUrl(path, 3600);
+        downloadUrl = urlData?.signedUrl;
+      }
 
       toDownload.push({
         ...rec,
-        downloadUrl: urlData?.signedUrl
+        downloadUrl
       });
     }
 
@@ -256,6 +271,10 @@ app.post('/api/recordings/sync', requireAuth, async (req, res) => {
 // Generate a signed upload URL for a specific file
 app.post('/api/upload/sign', requireAuth, async (req, res) => {
   try {
+    if (!supabaseAdmin) {
+        return res.status(503).json({ error: 'Storage service not configured' });
+    }
+      
     const { filename } = req.body;
     if (!filename) return res.status(400).json({ error: 'Filename required' });
 
