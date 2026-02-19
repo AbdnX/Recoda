@@ -311,7 +311,15 @@ app.post('/api/waitlist', async (req, res) => {
       return res.status(400).json({ error: 'Valid email required' });
     }
 
-    const waitlistPath = path.join(__dirname, 'waitlist.json');
+    // On Vercel, filesystem is ephemeral. We can't persist waitlist to JSON.
+    // Ideally use a database. For now, if on Vercel, just log it or return 200 to not break UI.
+    // Or save to /tmp but it will disappear.
+    if (process.env.VERCEL) {
+        console.log(`[Waitlist Vercel] New email: ${email}`);
+        return res.json({ success: true, message: 'Joined waitlist (Ephemeral)' });
+    }
+
+    const waitlistPath = path.join(__dirname, '../waitlist.json');
     let waitlist = [];
     
     if (await fs.pathExists(waitlistPath)) {
@@ -337,6 +345,10 @@ app.post('/api/waitlist', async (req, res) => {
 // Save a recording file to the server's local filesystem + metadata
 app.post('/api/local/save', requireAuth, upload.single('file'), async (req, res) => {
   try {
+    if (process.env.VERCEL) {
+        return res.status(503).json({ error: 'Local save not supported on Vercel. Use Cloud Sync.' });
+    }
+
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
@@ -418,6 +430,7 @@ app.get('/api/local/file/:filename', requireAuth, async (req, res) => {
 });
 
 // Start server
+// Start server if run directly (local development)
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Recoda API running on http://localhost:${port}`);
@@ -426,4 +439,5 @@ if (require.main === module) {
   });
 }
 
+// Export for Vercel
 module.exports = app;
