@@ -15,16 +15,35 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Local Storage Setup
-const RECORDINGS_DIR = path.join(__dirname, 'recordings');
-fs.ensureDirSync(RECORDINGS_DIR);
+// Local Storage Setup
+const RECORDINGS_DIR = path.join(process.env.tmpdir || '/tmp', 'recordings'); // Use /tmp for serverless (ephemeral) or fall back
+// In serverless, we might not have permission to write to __dirname or it might be read-only.
+// We should only attempt to create dirs if we are NOT in a read-only env, or accept it might fail.
+
+try {
+  // Try to create the directory. If it fails (read-only), we just log it.
+  // Real local saves won't work in Vercel anyway.
+  if (!process.env.VERCEL) {
+      fs.ensureDirSync(path.join(__dirname, 'recordings'));
+  }
+} catch (e) {
+  console.warn('⚠️  Could not create recordings directory (expected in Serverless):', e.message);
+}
 
 // Multer Setup for local saves
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // If authenticated, we could sub-folder by user ID
-    const userDir = req.user ? path.join(RECORDINGS_DIR, req.user.id) : RECORDINGS_DIR;
-    fs.ensureDirSync(userDir);
-    cb(null, userDir);
+    // On Vercel, use /tmp
+    const baseDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, 'recordings');
+    
+    try {
+        const userDir = req.user ? path.join(baseDir, req.user.id) : baseDir;
+        fs.ensureDirSync(userDir);
+        cb(null, userDir);
+    } catch (e) {
+        cb(e);
+    }
   },
   filename: (req, file, cb) => {
     // Use the filename provided in the body or originalname
