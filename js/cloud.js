@@ -11,6 +11,7 @@ import { renderRecordings, getAllRecordings } from './recordings.js'; // Need to
 
 // DOM refs
 let syncBtn = null;
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
 
 /**
  * Initialize Cloud Sync UI
@@ -121,7 +122,7 @@ async function syncRecordings(token) {
   }));
 
   // 2. Call Sync API
-  const res = await fetch('http://localhost:3001/api/recordings/sync', {
+  const res = await fetch(`${API_BASE}/api/recordings/sync`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ async function uploadRecording(rec, token) {
   // 1. Get signed upload URL (or use direct upload if policy allows)
   // We'll use the signed URL endpoint we built to be safe
   console.log(`Getting signed URL for ${rec.filename}...`);
-  const signRes = await fetch('http://localhost:3001/api/upload/sign', {
+  const signRes = await fetch(`${API_BASE}/api/upload/sign`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -201,7 +202,7 @@ async function uploadRecording(rec, token) {
 
   // 3. Save metadata to backend
   console.log('Saving metadata...');
-  const metaRes = await fetch('http://localhost:3001/api/recordings', {
+  const metaRes = await fetch(`${API_BASE}/api/recordings`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

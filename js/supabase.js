@@ -27,7 +27,8 @@ export async function getSupabase() {
 
   // Try to fetch config from backend API
   try {
-    const res = await fetch('http://localhost:3001/api/config/supabase');
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+    const res = await fetch(`${API_BASE}/api/config/supabase`);
     if (res.ok) {
       const config = await res.json();
       SUPABASE_URL = config.url;

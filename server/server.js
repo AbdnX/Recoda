@@ -377,8 +377,12 @@ app.get('/api/local/file/:filename', requireAuth, async (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`🚀 Recoda API running on http://localhost:${port}`);
-  console.log(`Helpers:`);
-  console.log(`  Health: http://localhost:${port}/api/health`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`🚀 Recoda API running on http://localhost:${port}`);
+    console.log(`Helpers:`);
+    console.log(`  Health: http://localhost:${port}/api/health`);
+  });
+}
+
+module.exports = app;

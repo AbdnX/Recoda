@@ -95,7 +95,8 @@ function initWaitlist() {
       btn.textContent = 'Joining...';
 
       try {
-        const res = await fetch('http://localhost:3001/api/waitlist', {
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+        const res = await fetch(`${API_BASE}/api/waitlist`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })

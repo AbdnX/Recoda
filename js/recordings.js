@@ -15,6 +15,7 @@ const recordings = [];
 let dlTarget = null;        // recording object currently in the modal
 let dlSelectedFmt = 'mp4';  // selected download format
 let lastViewedRecording = null;  // track which recording is in the preview
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
 
 /** Get the recording currently loaded in the preview */
 export function getPreviewRecording() {
@@ -203,7 +204,7 @@ async function saveRecordingToLocal(rec) {
     formData.append('mime', rec.mime);
     formData.append('ts', rec.ts.toISOString());
 
-    const res = await fetch('http://localhost:3001/api/local/save', {
+    const res = await fetch(`${API_BASE}/api/local/save`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`
@@ -234,7 +235,7 @@ export async function fetchLocalRecordings() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return [];
 
-    const res = await fetch('http://localhost:3001/api/local/recordings', {
+    const res = await fetch(`${API_BASE}/api/local/recordings`, {
       headers: {
         'Authorization': `Bearer ${session.access_token}`
       }
@@ -391,7 +392,7 @@ export async function playRecording(r) {
       try {
         const sb = await getSupabase();
         const { data: { session } } = await sb.auth.getSession();
-        const authUrl = `http://localhost:3001/api/local/file/${encodeURIComponent(r.filename)}`;
+        const authUrl = `${API_BASE}/api/local/file/${encodeURIComponent(r.filename)}`;
         const res = await fetch(authUrl, {
           headers: { 'Authorization': `Bearer ${session.access_token}` }
         });
