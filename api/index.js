@@ -17,20 +17,12 @@ const port = process.env.PORT || 3000;
 // Local Storage Setup
 // When running from api/index.js, __dirname is .../api
 // We want recordings to be in project root/recordings locally
-const RECORDINGS_DIR = process.env.VERCEL ? path.join(process.env.tmpdir || '/tmp', 'recordings') : path.join(__dirname, '../recordings');
+const RECORDINGS_DIR = process.env.VERCEL ? 
+  path.join('/tmp', 'recordings') : 
+  path.join(__dirname, '../recordings');
 
-// In serverless, we might not have permission to write to __dirname or it might be read-only.
-// We should only attempt to create dirs if we are NOT in a read-only env, or accept it might fail.
-
-try {
-  // Try to create the directory. If it fails (read-only), we just log it.
-  // Real local saves won't work in Vercel anyway.
-  if (!process.env.VERCEL) {
-      fs.ensureDirSync(RECORDINGS_DIR);
-  }
-} catch (e) {
-  console.warn('⚠️  Could not create recordings directory (expected in Serverless):', e.message);
-}
+// NOTE: We do NOT create directories at startup to avoid "Read-only file system" errors on Vercel
+// during cold starts or build analysis. Directory creation is handled lazily in routes.
 
 // Multer Setup for local saves
 const storage = multer.diskStorage({
