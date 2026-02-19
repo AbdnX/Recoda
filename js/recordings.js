@@ -314,7 +314,7 @@ export function renderRecordings() {
       </div>
       <div class="rec-actions">
         <button class="btn-ghost-sm btn-play-rec" data-i="${i}" title="Play"><i data-lucide="play" style="width:14px;height:14px;"></i></button>
-        <button class="btn-ghost-sm btn-local-rec" data-i="${i}" title="Save to local library"><i data-lucide="hard-drive" style="width:14px;height:14px;"></i></button>
+        ${window.location.hostname === 'localhost' ? `<button class="btn-ghost-sm btn-local-rec" data-i="${i}" title="Save to local library"><i data-lucide="hard-drive" style="width:14px;height:14px;"></i></button>` : ''}
         <button class="btn-ghost-sm btn-dl-rec" data-i="${i}" title="Download"><i data-lucide="download" style="width:14px;height:14px;"></i></button>
         <button class="btn-ghost-sm btn-del-rec" data-i="${i}" title="Delete" style="color:var(--accent);"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
       </div>
