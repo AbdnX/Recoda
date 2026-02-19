@@ -1,0 +1,208 @@
+/* ═══════════════════════════════════════════════════════════════
+   RECORDINGS LIST
+   ═══════════════════════════════════════════════════════════════ */
+.recordings-section {
+  padding: 28px 0 40px;
+  flex: 1;
+}
+.recordings-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.recordings-heading h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+.recordings-count {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+}
+.recordings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.recordings-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  opacity: 0.5;
+}
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  transition: background var(--duration) var(--ease);
+  animation: rec-enter 0.4s var(--ease) forwards;
+}
+.rec-row:hover { background: var(--bg-elevated); }
+@keyframes rec-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.rec-name {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.rec-duration {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.rec-size {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  min-width: 50px;
+  text-align: right;
+}
+.rec-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.rec-icon-btn {
+  width: 32px; height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all var(--duration) var(--ease);
+}
+.rec-icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border);
+  background: var(--bg-elevated);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RECENT RECORDINGS (HOMEPAGE)
+   ═══════════════════════════════════════════════════════════════ */
+.recent-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.btn-text:hover {
+  background: var(--bg-surface-2);
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-card {
+  /* JS adds inline styles, but base styles here for backup/override */
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.recent-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--bg-surface-1);
+  border-radius: 8px;
+  border: 1px dashed var(--border-subtle);
+}
+
+.recent-icon {
+  width: 32px; 
+  height: 32px; 
+  background: var(--bg-surface-1); 
+  border-radius: 6px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.recent-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.recent-name {
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-meta {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.recent-card:hover {
+  background: var(--bg-surface-3);
+  border-color: var(--border);
+}
+
+.recent-card:hover .recent-icon {
+  background: var(--bg-surface-2);
+}

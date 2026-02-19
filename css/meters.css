@@ -1,0 +1,51 @@
+/* ═══════════════════════════════════════════════════════════════
+   AUDIO LEVEL METERS — segmented horizontal bars
+   ═══════════════════════════════════════════════════════════════ */
+.meters-section {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  display: none;
+}
+.meters-section.visible { display: block; }
+.meter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.meter-row:last-child { margin-bottom: 0; }
+.meter-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.meter-track {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  align-items: stretch;
+}
+.meter-seg {
+  flex: 1;
+  border-radius: 1px;
+  background: #1e1e1e;
+  transition: background 0.06s linear;
+}
+.meter-seg.lit-green  { background: var(--accent-ready); }
+.meter-seg.lit-yellow { background: var(--accent-pause); }
+.meter-seg.lit-red    { background: var(--accent-record); }
+.meter-db {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  width: 36px;
+  text-align: left;
+  flex-shrink: 0;
+}

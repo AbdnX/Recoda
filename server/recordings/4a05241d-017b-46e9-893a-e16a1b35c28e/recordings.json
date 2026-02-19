@@ -1,0 +1,23 @@
+[
+  {
+    "filename": "rec-2026-02-16_08-02.mp4",
+    "duration": 7,
+    "mime": "video/mp4;codecs=avc1,opus",
+    "ts": "2026-02-16T07:02:49.389Z",
+    "size": 1236578
+  },
+  {
+    "filename": "rec-2026-02-16_07-54.mp4",
+    "duration": 7,
+    "mime": "video/mp4;codecs=avc1,opus",
+    "ts": "2026-02-16T06:54:51.035Z",
+    "size": 1065791
+  },
+  {
+    "filename": "rec-2026-02-15_19-45.mp4",
+    "duration": 43,
+    "mime": "video/mp4;codecs=avc1,opus",
+    "ts": "2026-02-15T18:45:43.210Z",
+    "size": 13165712
+  }
+]

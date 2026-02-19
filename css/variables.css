@@ -1,0 +1,40 @@
+:root {
+  /* Color Palette - Dark Premium */
+  --bg-base: #080808;
+  --bg-surface: #101010;
+  --bg-surface-2: #161616;
+  --bg-surface-3: #202020;
+  --bg-elevated: #1a1a1a;
+  
+  --border: #222222;
+  --border-subtle: #1a1a1a;
+  
+  --text-primary: #efefef;
+  --text-secondary: #888888;
+  --text-tertiary: #555555;
+  
+  /* Feature Colors */
+  --accent-ready: #00e5a0;
+  --accent-record: #ff3040;
+  --accent-pause: #ffb800;
+  
+  /* Glows */
+  --glow-ready: rgba(0, 229, 160, 0.4);
+  --glow-pause: rgba(255, 184, 0, 0.4);
+  --accent-glow: rgba(255, 48, 64, 0.4);
+  
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Misc */
+  --duration: 0.3s;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+  --radius: 12px;
+  
+  /* Overlay colors for countdown, etc */
+  --overlay-bg: rgba(8, 8, 8, 0.85);
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — Recoda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/marketing.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg-base);
+    }
+    .auth-page-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--text-primary);
+    }
+    .auth-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .auth-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+    }
+    .auth-footer a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .btn-lg {
+      padding: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-page-container">
+    <a href="index.html" class="back-link">
+      <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+      Back to Home
+    </a>
+    
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-subtitle">Join Recoda for free today</p>
+
+    <form id="signup-form">
+      <div class="form-group">
+        <label for="signup-email">Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" placeholder="Min. 6 characters" minlength="6" required>
+      </div>
+      <button type="submit" class="btn btn-primary full-width btn-lg" id="btn-signup-submit">Sign Up</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Login</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    
+    const SUPABASE_URL = 'https://bcmtpbpniajwvtyftpxs.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('signup-form');
+    const btn = document.getElementById('btn-signup-submit');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      
+      btn.textContent = 'Creating account...';
+      btn.disabled = true;
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      
+      if (error) {
+        alert(error.message);
+        btn.textContent = 'Sign Up';
+        btn.disabled = false;
+      } else {
+        alert('Account created! Please check your email for a confirmation link.');
+        window.location.href = '/login';
+      }
+    });
+
+    // Lucide
+    lucide.createIcons();
+    
+    // Check if already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      window.location.href = 'app.html';
+    }
+  </script>
+</body>
+</html>

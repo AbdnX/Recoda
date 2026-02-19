@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recoda — Recorder</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/main.css">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="app-shell">
+
+  <!-- UI RESTYLE: Sidebar mapping to Design Spec -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">R</a>
+
+    <nav class="sidebar-nav">
+      <a href="#home" class="nav-item active" id="nav-home">
+        <i data-lucide="home" class="nav-item-icon"></i>
+        <span class="nav-item-label">Home</span>
+      </a>
+      <a href="#library" class="nav-item" id="nav-library">
+        <i data-lucide="folder" class="nav-item-icon"></i>
+        <span class="nav-item-label">Library</span>
+        <span class="badge" id="library-badge" style="display:none;">0</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="#settings" class="nav-item" id="nav-settings">
+        <span class="nav-item-count">(0)</span>
+        <span class="nav-item-label">SETTINGS</span>
+      </a>
+      
+      <button class="nav-item" id="user-menu-btn" style="display:none; width: 30px; height: 30px; padding: 0;">
+        <div class="user-avatar" id="user-avatar">?</div>
+      </button>
+
+      <a href="/login" class="nav-item" id="nav-login">
+        <i data-lucide="user" class="nav-item-icon"></i>
+        <span class="nav-item-label">Login</span>
+      </a>
+    </div>
+
+    <!-- User Menu (Kept ID intact) -->
+    <div class="user-menu" id="user-menu" style="position: absolute; left: 74px; bottom: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 0; min-width: 180px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 101;">
+       <div style="padding: 12px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);">
+         <div id="user-name" style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 2px;">...</div>
+         <div id="user-email" style="font-size: 0.65rem; color: var(--text-secondary);">...</div>
+       </div>
+      <button id="btn-logout" class="nav-item" style="width: 100%; height: auto; padding: 10px 12px; flex-direction: row; gap: 8px; border-radius: 0;">
+        <i data-lucide="log-out" style="width:14px;height:14px;"></i>
+        <span style="font-size: 0.75rem; text-transform: none;">Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- UI RESTYLE: Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-logo">Recoda</span>
+        <span class="topbar-ver">v1.0.0</span>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot ready" id="status-dot"></span>
+        <span class="status-label" id="status-label">READY</span>
+      </div>
+    </header>
+
+    <!-- Home View -->
+    <section id="page-home" class="page active">
+      <div class="page-inner">
+        
+        <!-- UI RESTYLE: Screen 1 - Home / Idle -->
+        <div class="home-hero">
+          <div class="stepper">
+            <span class="step active"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+          </div>
+
+          <div class="idle-visual">
+            <div class="ring-outer"></div>
+            <div class="ring-inner"></div>
+            <div class="center-circle">
+              <i data-lucide="monitor" style="width: 30px; height: 30px; stroke: var(--text-secondary); stroke-width: 1.5;"></i>
+            </div>
+          </div>
+          
+          <h1 class="hero-title">What are you recording today?</h1>
+          <p class="hero-sub">Pick your sources, then hit record.<br>Everything stays on your machine.</p>
+
+          <!-- UI RESTYLE: Source Toggles (Mapped to existing settings logic) -->
+          <div class="source-chips">
+            <div class="chip active">
+              <i data-lucide="monitor" size="11"></i>
+              <span>Screen</span>
+            </div>
+            <div class="chip active">
+              <i data-lucide="mic" size="11"></i>
+              <span>Mic</span>
+            </div>
+            <div class="chip">
+              <i data-lucide="video" size="11"></i>
+              <span>Camera</span>
+            </div>
+            <div class="chip">
+              <i data-lucide="volume-2" size="11"></i>
+              <span>System</span>
+            </div>
+          </div>
+
+          <div class="cta-wrapper">
+            <div class="cta-pulse"></div>
+            <button id="btn-start" class="btn-primary">
+              <i data-lucide="circle" fill="currentColor" style="width: 10px; height: 10px;"></i>
+              <span>New Recording</span>
+            </button>
+          </div>
+
+          <!-- UI RESTYLE: Recent Strip -->
+          <div class="recent-strip">
+            <span class="strip-label">RECENT</span>
+            <div id="recent-list" class="recent-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- UI RESTYLE: Screen 4 - Active Recording (Hidden by default) -->
+        <div class="recording-layout">
+          <div class="recording-bar">
+            <div class="rec-indicator">
+              <div class="rec-dot-blink"></div>
+              <span>RECORDING</span>
+            </div>
+            <div class="rec-timer" id="timer">00:00:00</div>
+            <div class="rec-size" id="meter-size">0.0 MB</div>
+          </div>
+
+          <div class="preview-panel" id="preview-monitor">
+            <video id="preview-video" style="display:none;"></video>
+            <div id="preview-placeholder" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);">
+              <i data-lucide="video-off" style="width: 48px; height: 48px; opacity: 0.1;"></i>
+            </div>
+            
+            <div id="webcam-pip" class="webcam-pip" style="position: absolute; right: 20px; bottom: 20px; width: 160px; aspect-ratio: 4/3; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: none;">
+              <video id="webcam-video" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            </div>
+          </div>
+
+          <!-- UI RESTYLE: VU Meters -->
+          <div class="meters-panel" id="meters-section">
+            <div id="meter-mic-row" class="meter-row" style="display:none;">
+              <span class="meter-label">MIC</span>
+              <div class="meter-track" id="meter-mic-track"></div>
+              <span class="meter-label" id="meter-mic-db" style="width: auto; margin-left: auto;">—</span>
+            </div>
+            <div id="meter-sys-row" class="meter-row" style="display:none;">
+              <span class="meter-label">SYS</span>
+              <div class="meter-track" id="meter-sys-track"></div>
+              <span class="meter-label" id="meter-sys-db" style="width: auto; margin-left: auto;">—</span>
+            </div>
+          </div>
+
+          <div class="controls-row">
+            <button class="btn-ghost-circle" title="Add Note"><i data-lucide="sticky-note" size="18"></i></button>
+            <button id="btn-pause" class="btn-pill btn-pill-ghost">
+              <i data-lucide="pause" id="pause-icon" size="16"></i>
+              <span id="pause-label">Pause</span>
+            </button>
+            <button id="btn-stop" class="btn-pill btn-pill-accent">
+              <i data-lucide="square" fill="currentColor" size="14"></i>
+              <span>Stop & Save</span>
+            </button>
+            <button class="btn-ghost-circle" title="Screenshot"><i data-lucide="camera" size="18"></i></button>
+          </div>
+        </div>
+
+        <!-- UI RESTYLE: Screen 6 - Done / Saved (Appears inside Home View after stop) -->
+        <div id="done-view" class="done-card" style="display: none;">
+          <div class="done-preview">
+            <div class="play-frosted"><i data-lucide="play" fill="currentColor" size="20" style="margin-left: 3px;"></i></div>
+            <div class="check-badge"><i data-lucide="check" size="14"></i></div>
+          </div>
+          <div class="done-body">
+            <div class="done-filename" id="done-filename">recording.mp4</div>
+            <h2 class="done-title">Recording saved</h2>
+            <div class="done-meta">
+              <span id="done-duration">00:00</span> · Saved locally · <span id="done-size">0.0 MB</span>
+            </div>
+            <div class="done-actions">
+              <button class="btn-pill btn-pill-accent" onclick="window.location.hash='#library'">View in Library</button>
+              <button class="btn-pill btn-pill-ghost">Share</button>
+            </div>
+          </div>
+          <a href="#home" class="record-another" id="btn-record-another">+ Record another</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Library View -->
+    <section id="page-library" class="page">
+      <div class="page-inner">
+        <header style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 32px;">
+          <h1 style="font-family: var(--font-display); font-size: 28px; font-weight: 700;">Library</h1>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <span id="rec-count" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">0 files</span>
+            <span id="library-count" style="display: none;"></span> 
+          </div>
+        </header>
+
+        <div id="library-empty" class="library-empty" style="text-align: center; padding: 60px 0;">
+          <i data-lucide="inbox" style="width: 48px; height: 48px; opacity: 0.1; margin-bottom: 16px;"></i>
+          <p style="color: var(--text-secondary); font-size: 14px;">No recordings yet.</p>
+          <button class="btn-pill btn-pill-ghost" style="margin: 20px auto;" onclick="window.location.hash='#home'">Go to Recorder</button>
+        </div>
+
+        <div id="rec-list" class="rec-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Player View -->
+    <section id="page-player" class="page">
+      <div class="page-inner" style="display: flex; align-items: center; justify-content: center; height: calc(100vh - 100px); padding: 0;">
+        <div class="player-modal-card">
+          <header class="player-modal-header">
+            <span id="player-filename" class="player-filename-label">rec-2024-02-16.mp4</span>
+            <button class="btn-close-player" onclick="window.history.back()" title="Close">
+              <i data-lucide="x" style="width:16px;height:16px;"></i>
+            </button>
+          </header>
+
+          <div class="player-video-area">
+             <video id="player-video" controls></video>
+             <div id="player-preview-hint" class="player-hint" style="display: none;">
+               <i data-lucide="video" style="width: 32px; height: 32px; opacity: 0.1; margin-bottom: 12px;"></i>
+               <span>Connect to your video source to preview</span>
+             </div>
+          </div>
+
+          <footer class="player-modal-footer">
+            <div id="player-meta" class="player-meta-minimal">
+              <i data-lucide="clock" style="width:12px;height:12px;opacity:0.5;"></i>
+              <span id="player-duration-val">00:00:43</span>
+              <i data-lucide="file-video" style="width:12px;height:12px;opacity:0.5;margin-left:8px;"></i>
+              <span id="player-size-val">12.6 MB</span>
+            </div>
+            <div class="player-modal-actions">
+              <button id="player-share" class="btn-player-ghost"><i data-lucide="share-2" size="14"></i> Share</button>
+              <button id="player-edit" class="btn-player-ghost"><i data-lucide="scissors" size="14"></i> Trim</button>
+              <button id="player-del" class="btn-player-ghost" style="color:var(--accent);"><i data-lucide="trash-2" size="14"></i> Delete</button>
+              <button id="player-dl" class="btn-player-accent"><i data-lucide="download" size="14"></i> Download</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings View -->
+    <section id="page-settings" class="page">
+      <div class="page-inner">
+        <header style="margin-bottom: 32px;">
+          <h1 style="font-family: var(--font-display); font-size: 28px; font-weight: 700;">Settings</h1>
+        </header>
+
+        <div style="display: grid; gap: 24px; max-width: 520px;">
+          <div class="settings-group">
+            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Audio Source</label>
+            <select id="audio-source" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
+              <option value="none">None (No Audio)</option>
+              <option value="mic">Microphone Only</option>
+              <option value="system">System Audio Only</option>
+              <option value="both" selected>Microphone + System</option>
+            </select>
+          </div>
+
+          <div class="settings-group">
+            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Video Quality</label>
+            <select id="video-quality" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
+              <option value="720">720p (Good)</option>
+              <option value="1080" selected>1080p (Best)</option>
+            </select>
+          </div>
+
+          <div class="settings-group">
+            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Output Format</label>
+            <select id="output-format" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="mp4">MP4 (AVC/AAC)</option>
+              <option value="webm">WebM (VP9/Opus)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px;">
+            <div>
+              <strong style="display: block; font-size: 15px; margin-bottom: 4px;">Webcam PiP</strong>
+              <p style="font-size: 12px; color: var(--text-secondary);">Show camera feed in the corner</p>
+            </div>
+            <button id="toggle-webcam" style="width: 48px; height: 26px; border-radius: 13px; background: var(--bg-elevated); border: 1px solid var(--border); position: relative; cursor: pointer;">
+              <span style="position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #555; top: 2px; left: 2px; transition: all 0.2s;"></span>
+              <span id="webcam-status-text" style="display: none;">Off</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- UI RESTYLE: Screen 3 - Countdown Overlay -->
+  <div id="countdown-overlay" class="countdown-overlay">
+    <div class="countdown-visual">
+      <svg class="countdown-ring" width="140" height="140">
+        <circle class="ring-bg" cx="70" cy="70" r="62"></circle>
+        <circle class="ring-progress" cx="70" cy="70" r="62"></circle>
+      </svg>
+      <div id="countdown-number" class="countdown-number">3</div>
+    </div>
+    <span class="countdown-label">Recording starts in…</span>
+    <button class="btn-pill btn-pill-ghost" onclick="location.reload()">Cancel</button>
+  </div>
+
+  <!-- UI RESTYLE: Screen 5 - Saving Overlay (Added as decorative state) -->
+  <div id="saving-overlay" class="saving-overlay">
+    <div class="spinner"></div>
+    <h3 class="saving-title">Saving recording…</h3>
+    <div class="saving-status" id="saving-status">Mixing streams...</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="saving-progress"></div>
+    </div>
+  </div>
+
+  <!-- UI RESTYLE: Download Modal -->
+  <div class="modal-backdrop" id="dl-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 400; align-items: center; justify-content: center;">
+    <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 100%; max-width: 420px; position: relative;">
+      <button id="dl-modal-close" style="position: absolute; top: 20px; right: 20px; background: none; color: var(--text-secondary);"><i data-lucide="x" size="20"></i></button>
+      <h3 id="dl-file-name" style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px;">recording.mp4</h3>
+      <p id="dl-file-meta" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-bottom: 32px;">00:00 · 0 MB · MP4</p>
+      
+      <div style="display: grid; gap: 12px; margin-bottom: 32px;">
+        <div class="dl-format-card active" id="dl-fmt-mp4" style="padding: 16px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;">
+          <strong style="display: block; margin-bottom: 4px; font-size: 14px;">Download as MP4</strong>
+          <p style="font-size: 11px; color: var(--text-secondary);" class="dl-format-hint">Best compatibility</p>
+        </div>
+        <div class="dl-format-card" id="dl-fmt-webm" style="padding: 16px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;">
+          <strong style="display: block; margin-bottom: 4px; font-size: 14px;">Download as WebM</strong>
+          <p style="font-size: 11px; color: var(--text-secondary);" class="dl-format-hint">Fastest export</p>
+        </div>
+      </div>
+
+      <button id="dl-action" class="btn-pill btn-pill-accent" style="width: 100%; justify-content: center; height: 48px;">Download File</button>
+      <p id="dl-compat-note" style="font-size: 11px; color: var(--text-muted); margin-top: 16px; text-align: center; line-height: 1.4;"></p>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/app.js"></script>
+  <script>
+    // Purely decorative: handle Screen transitions via CSS classes on body
+    const observer = new MutationObserver(() => {
+      const statusLabel = document.getElementById('status-label');
+      const dlBtn = document.getElementById('preview-dl-btn');
+      const isVisible = dlBtn && dlBtn.style.display !== 'none';
+      
+      if (statusLabel) {
+        const stateText = statusLabel.textContent.toLowerCase();
+        document.body.classList.remove('state-idle', 'state-recording', 'state-paused', 'state-saving', 'state-done');
+        
+        if (stateText === 'ready') {
+          if (isVisible) document.body.classList.add('state-done');
+          else document.body.classList.add('state-idle');
+        } else if (stateText === 'recording') {
+          document.body.classList.add('state-recording');
+        } else if (stateText === 'paused') {
+          document.body.classList.add('state-paused');
+        } else if (stateText.includes('saving')) {
+          document.body.classList.add('state-saving');
+        }
+      }
+    });
+    
+    const statusLabel = document.getElementById('status-label');
+    const dlBtn = document.getElementById('preview-dl-btn');
+    if (statusLabel) observer.observe(statusLabel, { characterData: true, childList: true, subtree: true });
+    if (dlBtn) observer.observe(dlBtn, { attributes: true, attributeFilter: ['style'] });
+
+    // Handle "Record another" refresh
+    document.getElementById('btn-record-another')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.reload(); // Simplest way to reset all states without changing JS
+    });
+  </script>
+</body>
+</html>

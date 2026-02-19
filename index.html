@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Recoda — Record your screen. Keep it yours.</title>
+  <meta name="description" content="Recoda runs entirely in your browser. No installs, no uploads, no compromises. The screen recorder for serious teams.">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Recoda — The Private, Browser-Native Screen Recorder">
+  <meta property="og:description" content="No installs. No uploads. Your recordings stay on your machine.">
+  <meta property="og:image" content="https://via.placeholder.com/1200x630/080808/efefef?text=Recoda">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/marketing.css">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- 1. Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <span class="logo-dot">●</span>Recoda
+      </a>
+      
+      <div class="nav-links desktop-only">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </div>
+
+      <div class="nav-actions desktop-only">
+        <a href="/login" class="btn btn-ghost">Login</a>
+        <a href="/signup" class="btn btn-primary btn-pill">Sign up</a>
+      </div>
+
+      <button class="menu-toggle mobile-only" aria-label="Toggle menu">
+        <i data-lucide="menu"></i>
+      </button>
+
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu mobile-only">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="/login">Login</a>
+      <a href="/signup" class="btn btn-primary">Sign up</a>
+    </div>
+
+  </nav>
+
+  <main>
+    <!-- 2. Hero Section -->
+    <section id="hero" class="hero-section">
+      <div class="container hero-container">
+        <div class="hero-content">
+          <div class="overline">No installs. No uploads. No compromises.</div>
+          <h1 class="hero-title">Record your screen.<br>Keep it yours.</h1>
+          <p class="hero-subtitle">
+            Recoda runs entirely in your browser, saves recordings directly to your machine, and never touches a server. Built for founders, developers, and remote teams who move fast.
+          </p>
+          
+          <div class="hero-actions">
+            <a href="/signup" class="btn btn-primary btn-lg btn-glow">
+              Sign up
+            </a>
+            <a href="#how-it-works" class="btn btn-ghost btn-lg">
+              See How It Works
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-glow"></div>
+          <!-- Stylized Code Art UI -->
+          <div class="ui-mockup">
+            <div class="ui-header">
+              <div class="ui-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="ui-address-bar">recoda.app/recording...</div>
+            </div>
+            <div class="ui-body">
+              <div class="ui-waveform">
+                <!-- CSS generated bars -->
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar active"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+              <div class="ui-controls">
+                <div class="ui-time">00:02:47</div>
+                <div class="ui-record-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Social Proof -->
+    <section id="trusted-by" class="social-proof">
+      <div class="container">
+        <span class="proof-label">Trusted by teams at</span>
+        <div class="logos-grid">
+          <span class="logo-item">Stripe</span>
+          <span class="logo-item">Vercel</span>
+          <span class="logo-item">Linear</span>
+          <span class="logo-item">Raycast</span>
+          <span class="logo-item">Notion</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Features -->
+    <section id="features" class="features-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Everything you need.<br>Nothing you don't.</h2>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card">
+            <i data-lucide="video" class="feature-icon"></i>
+            <h3>Browser-Native</h3>
+            <p>No app to download. Open Recoda, hit record, and go. Works on any modern browser.</p>
+          </div>
+          <div class="feature-card">
+            <i data-lucide="hard-drive" class="feature-icon"></i>
+            <h3>100% Local Storage</h3>
+            <p>Your recordings never touch our servers. Files go straight to your machine, always.</p>
+          </div>
+          <div class="feature-card">
+            <i data-lucide="mic" class="feature-icon"></i>
+            <h3>Mic + System Audio</h3>
+            <p>Capture your voice, system sound, or both — mixed cleanly into a single track.</p>
+          </div>
+          <div class="feature-card">
+            <i data-lucide="zap" class="feature-icon"></i>
+            <h3>Zero Setup</h3>
+            <p>No accounts required to start recording. Sign up only when you want to save your library.</p>
+          </div>
+          <div class="feature-card">
+            <i data-lucide="library" class="feature-icon"></i>
+            <h3>Persistent Library</h3>
+            <p>Every recording is logged and remembered in your browser. Come back days later intact.</p>
+          </div>
+          <div class="feature-card">
+            <i data-lucide="camera" class="feature-icon"></i>
+            <h3>Webcam Overlay</h3>
+            <p>Add a picture-in-picture camera feed to your recording with one click.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. How It Works -->
+    <section id="how-it-works" class="how-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>From zero to recorded<br>in three steps</h2>
+        </div>
+
+        <div class="steps-flow">
+          <div class="step-item">
+            <div class="step-num">01</div>
+            <h3>Open Recoda</h3>
+            <p>No download, no login. Just open the URL and you're ready.</p>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <div class="step-num">02</div>
+            <h3>Choose Source</h3>
+            <p>Pick your screen, window, or tab. Add mic or system audio.</p>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <div class="step-num">03</div>
+            <h3>Hit Record</h3>
+            <p>When you stop, the file lands on your machine instantly.</p>
+          </div>
+        </div>
+
+        <div class="center-cta">
+          <a href="app.html" class="btn btn-primary btn-lg">Try it now — it's free</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Pricing -->
+    <section id="pricing" class="pricing-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Simple pricing.<br>No surprises.</h2>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Free -->
+          <div class="pricing-card">
+            <div class="card-header">
+              <h3>Free</h3>
+              <div class="price">$0<span>/mo</span></div>
+            </div>
+            <ul class="features-list">
+              <li><i data-lucide="check"></i> Unlimited recordings</li>
+              <li><i data-lucide="check"></i> Local storage only</li>
+              <li><i data-lucide="check"></i> Up to 30 min per recording</li>
+              <li><i data-lucide="check"></i> 7-day history</li>
+            </ul>
+            <a href="/signup" class="btn btn-ghost full-width">Sign up for Free</a>
+          </div>
+
+          <!-- Pro -->
+          <div class="pricing-card pro active">
+            <div class="popular-badge">Most Popular</div>
+            <div class="card-header">
+              <h3>Pro</h3>
+              <div class="price">$9<span>/mo</span></div>
+            </div>
+            <ul class="features-list">
+              <li><i data-lucide="check"></i> Everything in Free</li>
+              <li><i data-lucide="check"></i> Unlimited recording length</li>
+              <li><i data-lucide="check"></i> Persistent library, forever</li>
+              <li><i data-lucide="check"></i> Webcam overlay</li>
+              <li><i data-lucide="check"></i> Custom save folders</li>
+            </ul>
+            <a href="#waitlist" class="btn btn-primary full-width">Start Free Trial</a>
+          </div>
+
+          <!-- Team -->
+          <div class="pricing-card">
+            <div class="card-header">
+              <h3>Team</h3>
+              <div class="price">$29<span>/mo</span></div>
+            </div>
+            <ul class="features-list">
+              <li><i data-lucide="check"></i> Everything in Pro</li>
+              <li><i data-lucide="check"></i> Up to 10 seats</li>
+              <li><i data-lucide="check"></i> Shared team library</li>
+              <li><i data-lucide="check"></i> Priority support</li>
+            </ul>
+            <button class="btn btn-ghost full-width">Contact Us</button>
+          </div>
+        </div>
+        
+        <p class="pricing-note">All plans start with a 14-day free trial. No credit card required.</p>
+      </div>
+    </section>
+
+    <!-- 7. Waitlist -->
+    <section id="waitlist" class="waitlist-section">
+      <div class="container waitlist-container">
+        <div class="glow-bg"></div>
+        <div class="waitlist-content">
+          <h2>Be first when we launch.</h2>
+          <p>Recoda is in early access. Join the waitlist and get 3 months of Pro free at launch.</p>
+          
+          <form id="waitlist-form" class="waitlist-form">
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <button type="submit" class="btn btn-primary">Join Waitlist</button>
+          </form>
+          <div id="waitlist-success" class="success-msg" style="display: none;">
+            <i data-lucide="check-circle" style="color: var(--accent-green);"></i>
+            <span>You're on the list. We'll be in touch.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. FAQ -->
+    <section id="faq" class="faq-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Questions we actually<br>get asked</h2>
+        </div>
+
+        <div class="accordion">
+          <details>
+            <summary>Does Recoda upload my recordings anywhere? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">No. Recoda runs entirely in your browser. When you finish recording, the file is generated locally and saved to your Downloads folder or local disk. We never see your screen.</div>
+          </details>
+          <details>
+            <summary>What browsers does Recoda support? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">Recoda works on all modern browsers that support the MediaStream Recording API, including Chrome, Edge, Brave, and Firefox. Safari support is limited.</div>
+          </details>
+          <details>
+            <summary>Can I record system audio without a mic? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">Yes! When choosing your screen source, check the "Share system audio" box. You can capture system sound pure, or mix it with your microphone.</div>
+          </details>
+          <details>
+            <summary>What format are recordings saved in? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">By default, recordings are saved as WebM or MP4 (depending on browser support). These are highly optimized formats perfect for sharing.</div>
+          </details>
+          <details>
+            <summary>Is there a recording length limit? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">On the Free plan, recordings are capped at 30 minutes. Pro users can record for as long as their disk space allows.</div>
+          </details>
+          <details>
+            <summary>How is this different from Loom or OBS? <i data-lucide="chevron-down"></i></summary>
+            <div class="answer">Loom forces you to the cloud. OBS is powerful but complex to set up. Recoda sits in the middle: instant start like Loom, local privacy like OBS, with zero setup.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth Modal removed (using /login and /signup pages) -->
+
+  <!-- 9. Footer -->
+  <footer>
+    <div class="container footer-container">
+      <div class="footer-left">
+        <a href="#" class="logo-sm">Recoda</a>
+        <span class="copyright">© 2025 Recoda. Built for people who value their data.</span>
+      </div>
+      <div class="footer-right">
+        <a href="#"><i data-lucide="twitter"></i></a>
+        <a href="#"><i data-lucide="github"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/landing.js"></script>
+  <script type="module" src="js/landing-auth.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* ═══════════════════════════════════════════════════════════════
+   APP LANDING UI
+   The internal landing page shown first inside the app.
+   ═══════════════════════════════════════════════════════════════ */
+
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  background: radial-gradient(circle at 50% 20%, var(--bg-surface) 0%, var(--bg-base) 80%);
+  text-align: center;
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+.landing-hero {
+  margin-bottom: 60px;
+  max-width: 800px;
+  animation: heroFadeUp 0.8s ease-out forwards;
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .accent {
+  color: var(--accent-record);
+  /* slight gradient or glow */
+  text-shadow: 0 0 20px rgba(255, 48, 64, 0.3);
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-primary-large,
+.btn-secondary-large {
+  padding: 14px 32px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  font-size: 1rem;
+}
+
+.btn-primary-large {
+  background: var(--accent-record);
+  color: #fff;
+  border: 1px solid var(--accent-record);
+  box-shadow: 0 4px 12px rgba(255, 48, 64, 0.2);
+}
+.btn-primary-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 48, 64, 0.3);
+}
+
+.btn-secondary-large {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary-large:hover {
+  background: var(--bg-elevated);
+  border-color: #444;
+}
+
+/* ─── Features ─── */
+.landing-features {
+  width: 100%;
+  max-width: 1000px;
+  animation: featFadeUp 0.8s ease-out forwards 0.2s;
+  opacity: 0;
+}
+@keyframes featFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.feature-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+  border-radius: var(--radius);
+  text-align: left;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.feature-card:hover {
+  border-color: #333;
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  margin-bottom: 16px;
+  color: var(--accent-record);
+  width: 24px; height: 24px;
+}
+.feature-icon svg { width: 24px; height: 24px; }
+
+.feature-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.feature-desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Footer ─── */
+.landing-footer {
+  margin-top: 60px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards 0.4s;
+}
+
+.footer-text {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}

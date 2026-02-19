@@ -1,0 +1,39 @@
+/* ═══════════════════════════════════════════════════════════════
+   TIMER — the hero element
+   ═══════════════════════════════════════════════════════════════ */
+.timer-section {
+  padding: 48px 0 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.timer {
+  font-family: var(--font-mono);
+  font-size: 4.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  line-height: 1;
+  transition: color 0.5s var(--ease), text-shadow 0.5s var(--ease), opacity 0.5s var(--ease);
+}
+.timer.recording {
+  color: var(--text-primary);
+  text-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(255,48,64,0.08);
+}
+.timer.paused {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  animation: timer-blink 2s ease infinite;
+}
+@keyframes timer-blink {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.25; }
+}
+.timer-label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 12px;
+}

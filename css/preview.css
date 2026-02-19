@@ -1,0 +1,124 @@
+/* ═══════════════════════════════════════════════════════════════
+   PREVIEW MONITOR
+   ═══════════════════════════════════════════════════════════════ */
+.preview-section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+.preview-monitor {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.4);
+}
+.preview-monitor video {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+.preview-placeholder {
+  position: absolute; inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 2;
+}
+.preview-placeholder .ph-icon {
+  color: var(--text-secondary);
+  opacity: 0.25;
+}
+.preview-placeholder .ph-text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* Recording badge overlay */
+.rec-badge {
+  position: absolute;
+  top: 14px; left: 14px;
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(12px);
+  padding: 5px 12px 5px 10px;
+  border-radius: var(--radius-pill);
+  z-index: 10;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+.rec-badge.active { display: flex; }
+.rec-badge-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-record);
+  animation: dot-pulse 1.5s ease infinite;
+}
+.rec-badge.paused .rec-badge-dot {
+  background: var(--accent-pause);
+  animation: none;
+}
+
+/* Webcam overlay */
+.webcam-pip {
+  position: absolute;
+  bottom: 14px; right: 14px;
+  width: 160px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  z-index: 10;
+  display: none;
+  background: #000;
+  cursor: grab;
+  transition: border-color var(--duration) var(--ease);
+}
+.webcam-pip:hover { border-color: var(--text-secondary); }
+.webcam-pip.visible { display: block; }
+.webcam-pip video {
+  width: 100%; display: block;
+  transform: scaleX(-1);
+}
+
+/* Custom download button on preview */
+.preview-dl-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--duration) var(--ease);
+}
+.preview-monitor:hover .preview-dl-btn {
+  opacity: 1;
+}
+.preview-dl-btn:hover {
+  background: rgba(0, 229, 160, 0.2);
+  border-color: var(--accent-ready);
+  color: var(--accent-ready);
+  transform: scale(1.08);
+}

@@ -1,0 +1,70 @@
+/* ═══════════════════════════════════════════════════════════════
+   CONTROLS
+   ═══════════════════════════════════════════════════════════════ */
+.controls-section {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Primary pill button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 36px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-ready);
+  transition: all 200ms var(--ease);
+  border: none;
+  position: relative;
+}
+.btn-primary:hover { transform: scale(1.03); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary.recording {
+  background: var(--accent-record);
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px var(--accent-glow);
+}
+.btn-primary:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Ghost / secondary button */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  transition: all 200ms var(--ease);
+}
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+.btn-ghost:active { transform: scale(0.97); }
+.btn-ghost:disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}

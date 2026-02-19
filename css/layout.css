@@ -1,0 +1,182 @@
+/* ═══════════════════════════════════════════════════════════════
+   APP SHELL — sidebar + main content area
+   ═══════════════════════════════════════════════════════════════ */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 72px;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Page containers */
+.page {
+  display: none;
+}
+.page.active {
+  display: block;
+}
+
+/* Inner content column — centered with max-width */
+.page-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 32px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.header h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.header-version {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+/* Page header — used on Library page, etc. */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.page-header-meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+}
+
+/* Status dot */
+.status-dot-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  transition: color var(--duration) var(--ease);
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+  flex-shrink: 0;
+}
+.status-dot.ready {
+  background: var(--accent-ready);
+  box-shadow: 0 0 8px var(--glow-ready), 0 0 20px var(--glow-ready);
+}
+.status-dot.recording {
+  background: var(--accent-record);
+  box-shadow: 0 0 8px var(--accent-glow), 0 0 24px var(--accent-glow);
+  animation: dot-pulse 1.5s ease infinite;
+}
+.status-dot.paused {
+  background: var(--accent-pause);
+  box-shadow: 0 0 8px var(--glow-pause);
+  animation: none;
+}
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIBRARY PAGE — empty state
+   ═══════════════════════════════════════════════════════════════ */
+.library-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 12px;
+  flex: 1;
+}
+.library-empty-icon {
+  color: var(--text-secondary);
+  opacity: 0.2;
+}
+.library-empty-text {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+.library-empty-sub {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  opacity: 0.35;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .main-content {
+    margin-left: 0;
+    margin-bottom: 60px; /* space for bottom tab bar */
+  }
+  .page-inner {
+    padding: 0 16px;
+  }
+  .timer { font-size: 3rem; }
+  .timer-section { padding: 32px 0 28px; }
+  .settings-grid { grid-template-columns: 1fr; }
+  .controls-section { gap: 8px; }
+  .btn-primary { padding: 12px 28px; }
+  .btn-ghost { padding: 10px 16px; }
+  .rec-row { flex-wrap: wrap; }
+  .webcam-pip { width: 110px; }
+}
+
+/* Landing Mode: Hide sidebar and full width content */
+body.landing-mode .sidebar {
+  display: none !important;
+}
+body.landing-mode .main-content {
+  margin-left: 0 !important;
+}
