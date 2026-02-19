@@ -11,7 +11,7 @@ import { renderRecordings, getAllRecordings } from './recordings.js'; // Need to
 
 // DOM refs
 let syncBtn = null;
-const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
 
 /**
  * Initialize Cloud Sync UI

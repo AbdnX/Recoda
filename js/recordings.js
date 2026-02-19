@@ -15,7 +15,7 @@ const recordings = [];
 let dlTarget = null;        // recording object currently in the modal
 let dlSelectedFmt = 'mp4';  // selected download format
 let lastViewedRecording = null;  // track which recording is in the preview
-const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
 
 /** Get the recording currently loaded in the preview */
 export function getPreviewRecording() {
