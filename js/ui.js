@@ -141,4 +141,5 @@ function applyState(state) {
 /** Initialize UI by subscribing to state changes */
 export function initUI() {
   onStateChange(({ state }) => applyState(state));
+  if (window.lucide) lucide.createIcons();
 }

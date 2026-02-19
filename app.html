@@ -406,6 +406,9 @@
       e.preventDefault();
       window.location.reload(); // Simplest way to reset all states without changing JS
     });
+    
+    // Fallback icon init
+    if (window.lucide) lucide.createIcons();
   </script>
 </body>
 </html>
