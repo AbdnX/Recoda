@@ -123,6 +123,64 @@ app.post('/api/waitlist', async (req, res) => {
     console.error('Waitlist error:', err);
     res.status(500).json({ error: 'Internal error' });
   }
+
+});
+
+// GET /api/health
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// GET /api/config/supabase
+// Serve public Supabase config to the frontend
+app.get('/api/config/supabase', (req, res) => {
+  res.json({
+    url: process.env.SUPABASE_URL,
+    anonKey: process.env.SUPABASE_ANON_KEY
+  });
+});
+
+// ─── Cloud Sync API (Placeholders) ──────────────────────────
+
+// POST /api/recordings/sync
+app.post('/api/recordings/sync', requireAuth, async (req, res) => {
+  // Simple diff logic: everything is considered "toUpload" for now
+  const { localRecordings } = req.body;
+  res.json({
+    toUpload: localRecordings || [],
+    toDownload: []
+  });
+});
+
+// POST /api/upload/sign
+app.post('/api/upload/sign', requireAuth, async (req, res) => {
+  const { filename } = req.body;
+  const path = `${req.user.id}/${filename}`;
+  
+  // Actually get signed URL from Supabase
+  const { data, error } = await supabase.storage
+    .from('recordings')
+    .createSignedUploadUrl(path);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ signedUrl: data.signedUrl, path });
+});
+
+// POST /api/recordings (Metadata)
+app.post('/api/recordings', requireAuth, async (req, res) => {
+  const { filename, duration, size, mime_type } = req.body;
+  const { data, error } = await supabase
+    .from('recordings')
+    .insert([{
+      user_id: req.user.id,
+      filename,
+      duration,
+      size,
+      mime_type
+    }]);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data });
 });
 
 // ─── Local Save API ──────────────────────────────────────────

@@ -6,27 +6,41 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // CONFIG
-const SUPABASE_URL = 'https://bcmtpbpniajwvtyftpxs.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
 let supabase = null;
 
 async function initSupabase() {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
-  
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-  // Check if already logged in to update UI
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    updateLandingUI(session.user);
-  }
-
-  // Handle auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
+  try {
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+    const res = await fetch(`${API_BASE}/api/config/supabase`);
+    if (!res.ok) throw new Error('Config fetch failed');
+    const { url, anonKey } = await res.json();
+    
+    supabase = createClient(url, anonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'recoda-auth-token'
+      }
+    });
+    
+    // Check if already logged in to update UI
+    const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       updateLandingUI(session.user);
     }
-  });
+  
+    // Handle auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        updateLandingUI(session.user);
+      } else {
+        // Reset UI if logged out? For now just stay as is
+      }
+    });
+  } catch (err) {
+    console.warn('[Recoda] Supabase landing-auth init skipped:', err.message);
+  }
 }
 
 /**

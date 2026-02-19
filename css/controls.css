@@ -20,12 +20,11 @@
   padding: 14px 36px;
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   color: #fff;
-  background: var(--accent-ready);
+  background: var(--accent-record);
   transition: all 200ms var(--ease);
   border: none;
   position: relative;

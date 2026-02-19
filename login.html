@@ -121,15 +121,55 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
     
-    const SUPABASE_URL = 'https://bcmtpbpniajwvtyftpxs.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    let supabase;
     const form = document.getElementById('login-form');
     const btn = document.getElementById('btn-login-submit');
 
+    // Initialize Supabase
+    try {
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+      const res = await fetch(`${API_BASE}/api/config/supabase`);
+      let url, anonKey;
+      if (res.ok) {
+        const config = await res.json();
+        url = config.url;
+        anonKey = config.anonKey;
+      } else {
+        // Fallback to defaults
+        url = 'https://bcmtpbpniajwvtyftpxs.supabase.co';
+        anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
+      }
+      
+      supabase = createClient(url, anonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storageKey: 'recoda-auth-token'
+        }
+      });
+    } catch (err) {
+      console.error('Supabase init failed:', err);
+      // Last resort fallback
+      const url = 'https://bcmtpbpniajwvtyftpxs.supabase.co';
+      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
+      supabase = createClient(url, anonKey, {
+        auth: { storageKey: 'recoda-auth-token' }
+      });
+    }
+
+    if (supabase) {
+        // Check if already logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          window.location.href = 'app.html';
+        }
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!supabase) return;
+
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
       
@@ -150,11 +190,7 @@
     // Lucide
     lucide.createIcons();
     
-    // Check if already logged in
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      window.location.href = 'app.html';
-    }
+
   </script>
 </body>
 </html>

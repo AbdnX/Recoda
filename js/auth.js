@@ -123,6 +123,8 @@ export function updateUI(user) {
   const userName    = $('user-name');
   const userEmail   = $('user-email');
 
+  console.log('[Recoda] Updating Auth UI. User:', user ? user.email : 'None');
+
   // Update User Menu in Sidebar
   if (userMenuBtn) {
     userMenuBtn.style.display = user ? 'flex' : 'none';
@@ -139,5 +141,10 @@ export function updateUI(user) {
     if (userEmail) userEmail.textContent = email;
     if (userName) userName.textContent = email.split('@')[0];
     if (userAvatar) userAvatar.textContent = email[0].toUpperCase();
+  }
+
+  // Ensure icons are rendered for any changed elements
+  if (window.lucide) {
+    lucide.createIcons();
   }
 }
