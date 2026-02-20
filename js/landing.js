@@ -106,15 +106,17 @@ function initWaitlist() {
           form.style.display = 'none';
           successMsg.style.display = 'flex';
         } else {
-          alert('Something went wrong. Please try again.');
           btn.disabled = false;
           btn.textContent = 'Join Waitlist';
+          emailInput.style.borderColor = '#ff3040';
+          emailInput.placeholder = 'Something went wrong. Try again.';
         }
       } catch (err) {
         console.error('Waitlist error:', err);
-        alert('Could not connect to server. Check your connection.');
         btn.disabled = false;
         btn.textContent = 'Join Waitlist';
+        emailInput.style.borderColor = '#ff3040';
+        emailInput.placeholder = 'Could not connect. Check your connection.';
       }
     });
   }

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recoda — Recorder</title>
+  <meta name="description" content="Recoda screen recorder — browser-native, private, and instant. Record your screen with mic, system audio, and webcam overlay.">
+  <meta name="theme-color" content="#080808">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23ff3040'/%3E%3Ctext x='50' y='72' font-size='60' font-weight='800' fill='white' text-anchor='middle' font-family='sans-serif'%3ER%3C/text%3E%3C/svg%3E">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +14,7 @@
   
   <link rel="stylesheet" href="css/main.css">
 
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.344.0"></script>
 </head>
 <body class="app-shell">
 
@@ -346,7 +349,7 @@
   </div>
 
   <!-- UI RESTYLE: Download Modal -->
-  <div class="modal-backdrop" id="dl-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 400; align-items: center; justify-content: center;">
+  <div class="modal-backdrop" id="dl-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 400; align-items: center; justify-content: center;">
     <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 100%; max-width: 420px; position: relative;">
       <button id="dl-modal-close" style="position: absolute; top: 20px; right: 20px; background: none; color: var(--text-secondary);"><i data-lucide="x" size="20"></i></button>
       <h3 id="dl-file-name" style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px;">recording.mp4</h3>
@@ -373,18 +376,18 @@
   <!-- Scripts -->
   <script type="module" src="js/app.js"></script>
   <script>
-    // Purely decorative: handle Screen transitions via CSS classes on body
+    // State class management: apply body classes based on status label text
     const observer = new MutationObserver(() => {
       const statusLabel = document.getElementById('status-label');
-      const dlBtn = document.getElementById('preview-dl-btn');
-      const isVisible = dlBtn && dlBtn.style.display !== 'none';
+      const doneView = document.getElementById('done-view');
+      const isDone = doneView && doneView.style.display !== 'none';
       
       if (statusLabel) {
         const stateText = statusLabel.textContent.toLowerCase();
         document.body.classList.remove('state-idle', 'state-recording', 'state-paused', 'state-saving', 'state-done');
         
         if (stateText === 'ready') {
-          if (isVisible) document.body.classList.add('state-done');
+          if (isDone) document.body.classList.add('state-done');
           else document.body.classList.add('state-idle');
         } else if (stateText === 'recording') {
           document.body.classList.add('state-recording');
@@ -397,14 +400,19 @@
     });
     
     const statusLabel = document.getElementById('status-label');
-    const dlBtn = document.getElementById('preview-dl-btn');
+    const doneView = document.getElementById('done-view');
     if (statusLabel) observer.observe(statusLabel, { characterData: true, childList: true, subtree: true });
-    if (dlBtn) observer.observe(dlBtn, { attributes: true, attributeFilter: ['style'] });
+    if (doneView) observer.observe(doneView, { attributes: true, attributeFilter: ['style', 'class'] });
 
-    // Handle "Record another" refresh
+    // Handle "Record another" — reset done-view and reload
     document.getElementById('btn-record-another')?.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.reload(); // Simplest way to reset all states without changing JS
+      const dv = document.getElementById('done-view');
+      if (dv) { dv.style.display = 'none'; dv.classList.remove('active'); }
+      document.body.classList.remove('state-done');
+      document.body.classList.add('state-idle');
+      window.location.hash = '#home';
+      window.location.reload();
     });
     
     // Fallback icon init

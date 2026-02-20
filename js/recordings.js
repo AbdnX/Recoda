@@ -106,6 +106,8 @@ export function openDownloadModal(rec) {
   const dlNote = $('dl-compat-note');
 
   if (!dlModal) return;
+  // Reset any old state
+  dlModal.classList.remove('open');
 
   const native = getNativeFormat(rec);
   if (dlFileName) dlFileName.textContent = rec.filename;

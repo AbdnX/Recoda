@@ -931,3 +931,26 @@ body.state-saving .progress-fill { animation: progressGrow 1.8s ease forwards; }
 #player-dl.btn-player-accent:hover {
   border-color: var(--text-primary);
 }
+
+/* ─── Modal Backdrop ───────────────────────────────────────── */
+.modal-backdrop { display: none; }
+.modal-backdrop.open { display: flex; }
+
+/* ─── Global Button Reset ──────────────────────────────────── */
+button { cursor: pointer; }
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .topbar-left { gap: 6px; }
+  .topbar-logo { font-size: 15px; }
+  .page-inner { padding: 24px 16px; }
+  .home-hero { margin: 10px auto; }
+  .hero-title { font-size: 22px; }
+  .source-chips { flex-wrap: wrap; }
+  .controls-row { flex-wrap: wrap; justify-content: center; }
+  .player-modal-footer { flex-direction: column; gap: 12px; }
+  .player-modal-actions { flex-wrap: wrap; justify-content: center; }
+  .rec-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .rec-actions { align-self: flex-end; }
+}

@@ -55,15 +55,14 @@ function updateLandingUI(user) {
     if (!href) return;
 
     // Change "Login" or "Signup" links to go directly to App if logged in
-    // But keep the requested labels: "Login" and "Sign up"
     if (href.includes('/login') || href.includes('/signup') || href.includes('app.html')) {
-      const text = a.textContent.toLowerCase();
+      const text = a.textContent.toLowerCase().trim();
       
       if (text.includes('login')) {
-        a.textContent = 'Login';
+        a.textContent = 'Open App';
         a.setAttribute('href', '/app');
       } else if (text.includes('sign') || text.includes('started')) {
-        a.textContent = 'Sign up';
+        a.textContent = 'Open App';
         a.setAttribute('href', '/app');
       }
     }
@@ -72,7 +71,7 @@ function updateLandingUI(user) {
   // Specifically check hero button
   const heroBtn = document.querySelector('.hero-actions .btn-primary');
   if (heroBtn) {
-    heroBtn.textContent = 'Sign up';
+    heroBtn.textContent = 'Open App →';
     heroBtn.setAttribute('href', '/app');
   }
 }

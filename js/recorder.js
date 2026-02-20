@@ -78,12 +78,22 @@ function onStopped() {
   // Show recording in preview for instant playback
   showRecordingPreview(url);
 
-  // Show the preview download button
-  const dlBtn = document.getElementById('preview-dl-btn');
-  if (dlBtn) dlBtn.style.display = '';
+  // Show the done-view card with recording info
+  const doneView = $('done-view');
+  const doneFilename = $('done-filename');
+  const doneDuration = $('done-duration');
+  const doneSize = $('done-size');
+
+  if (doneView) {
+    doneView.style.display = 'block';
+    doneView.classList.add('active');
+    if (doneFilename) doneFilename.textContent = filename;
+    if (doneDuration) doneDuration.textContent = formatTime(duration);
+    if (doneSize) doneSize.textContent = (blob.size / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 
   if (timerEl) timerEl.textContent = formatTime(duration);
-  showToast('Recording ready — play above or download from the list', 'success', 4000);
+  showToast('Recording saved — view in Library or download', 'success', 4000);
 }
 
 // ─── Countdown ──────────────────────────────────────────────

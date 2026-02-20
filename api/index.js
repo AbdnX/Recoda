@@ -54,6 +54,23 @@ const upload = multer({ storage });
 app.use(cors());
 app.use(express.json());
 
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
+    // Only in production
+  } else {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
+
+// Async route wrapper to prevent unhandled promise rejections
+const asyncHandler = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
+
 // Initialize Supabase Client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -132,8 +149,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // GET /api/config/supabase
-// Serve public Supabase config to the frontend
+// Serve public Supabase config to the frontend (anon key only — NEVER expose service role key)
 app.get('/api/config/supabase', (req, res) => {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    return res.status(503).json({ error: 'Supabase not configured' });
+  }
   res.json({
     url: process.env.SUPABASE_URL,
     anonKey: process.env.SUPABASE_ANON_KEY
@@ -277,7 +297,12 @@ app.get('/api/local/file/:filename', requireAuth, async (req, res) => {
   }
 });
 
-// Start server
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Start server if run directly (local development)
 if (require.main === module) {
   app.listen(port, () => {
@@ -287,7 +312,6 @@ if (require.main === module) {
   });
 }
 
-// Export for Vercel
 // Export for Vercel - explicit handler wrapper
 module.exports = (req, res) => {
   app(req, res);

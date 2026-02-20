@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/marketing.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.344.0"></script>
   <style>
     body {
       display: flex;
@@ -101,6 +101,8 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-subtitle">Log in to your Recoda account</p>
 
+    <div id="login-msg" style="display:none; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:0.9rem;"></div>
+
     <form id="login-form">
       <div class="form-group">
         <label for="login-email">Email Address</label>
@@ -166,9 +168,19 @@
         }
     }
 
+    const msgEl = document.getElementById('login-msg');
+    function showMsg(text, isError) {
+      msgEl.textContent = text;
+      msgEl.style.display = 'block';
+      msgEl.style.background = isError ? 'rgba(255,48,64,0.1)' : 'rgba(0,229,160,0.1)';
+      msgEl.style.color = isError ? '#ff6b6b' : '#00e5a0';
+      msgEl.style.border = isError ? '1px solid rgba(255,48,64,0.3)' : '1px solid rgba(0,229,160,0.3)';
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!supabase) return;
+      msgEl.style.display = 'none';
 
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
@@ -179,7 +191,7 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
-        alert(error.message);
+        showMsg(error.message, true);
         btn.textContent = 'Log In';
         btn.disabled = false;
       } else {

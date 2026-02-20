@@ -1,18 +1,27 @@
 /**
  * Webcam PiP overlay with drag support.
+ * DOM elements are resolved lazily to avoid crashes when elements don't exist.
  */
 
 import { $ } from './utils.js';
 import { showToast } from './toast.js';
 
-const webcamPip   = $('webcam-pip');
-const webcamVideo = $('webcam-video');
-const parent      = $('preview-monitor');
-
 let webcamStream = null;
+
+/** Get DOM elements lazily */
+function getElements() {
+  return {
+    webcamPip: $('webcam-pip'),
+    webcamVideo: $('webcam-video'),
+    parent: $('preview-monitor'),
+  };
+}
 
 /** Open the webcam and show PiP overlay */
 export async function openWebcam() {
+  const { webcamPip, webcamVideo } = getElements();
+  if (!webcamPip || !webcamVideo) return;
+
   try {
     webcamStream = await navigator.mediaDevices.getUserMedia({
       video: { width: 320, height: 240, facingMode: 'user' },
@@ -26,12 +35,14 @@ export async function openWebcam() {
 
 /** Close the webcam and hide PiP */
 export function closeWebcam() {
+  const { webcamPip, webcamVideo } = getElements();
+
   if (webcamStream) {
     webcamStream.getTracks().forEach((t) => t.stop());
     webcamStream = null;
   }
-  webcamVideo.srcObject = null;
-  webcamPip.classList.remove('visible');
+  if (webcamVideo) webcamVideo.srcObject = null;
+  if (webcamPip) webcamPip.classList.remove('visible');
 }
 
 /** Get the raw webcam stream (for cleanup) */
@@ -41,6 +52,9 @@ export function getWebcamStream() {
 
 /** Initialize draggable behaviour for the PiP element */
 export function initWebcamDrag() {
+  const { webcamPip, parent } = getElements();
+  if (!webcamPip || !parent) return;
+
   let drag = false, sx, sy, sl, st;
 
   webcamPip.addEventListener('mousedown', (e) => {

@@ -12,6 +12,7 @@ export function resetPreview() {
   const previewVideo = $('preview-video');
   const placeholder  = $('preview-placeholder');
   const timerEl      = $('timer');
+  const doneView     = $('done-view');
 
   if (!previewVideo || !placeholder) return;
 
@@ -23,9 +24,11 @@ export function resetPreview() {
   placeholder.style.display = '';
   if (timerEl) timerEl.textContent = '00:00:00';
 
-  // Hide the preview download button
-  const dlBtn = document.getElementById('preview-dl-btn');
-  if (dlBtn) dlBtn.style.display = 'none';
+  // Reset done-view
+  if (doneView) {
+    doneView.style.display = 'none';
+    doneView.classList.remove('active');
+  }
 }
 
 /** Show the screen stream in the preview monitor */

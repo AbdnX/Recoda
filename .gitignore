@@ -1,3 +1,7 @@
 node_modules
 .DS_Store
 .env
+recordings/
+server/recordings/
+server/node_modules
+*.log
