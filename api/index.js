@@ -142,12 +142,21 @@ const asyncHandler = (fn) => (req, res, next) =>
 // Initialize Supabase Client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+let supabase = null;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('Missing Supabase environment variables!');
+} else {
+  supabase = createClient(supabaseUrl, supabaseKey);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+function hasSupabase(res) {
+  if (supabase) return true;
+  if (res) {
+    res.status(503).json({ error: 'Supabase not configured' });
+  }
+  return false;
+}
 
 // Auth Middleware
 const requireAuth = async (req, res, next) => {
@@ -155,6 +164,7 @@ const requireAuth = async (req, res, next) => {
     req.user = { id: req.headers['x-test-user-id'] || 'test-user' };
     return next();
   }
+  if (!hasSupabase(res)) return;
 
   const authHeader = req.headers.authorization;
   if (!authHeader) {

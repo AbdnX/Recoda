@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('playwright/test');
 
 test('landing page renders primary CTA and waitlist', async ({ page }) => {
   await page.goto('/index.html');
