@@ -121,52 +121,11 @@
   </div>
 
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { initSupabaseClient, redirectIfAuthenticated } from '/js/auth-bootstrap.js';
     
     let supabase;
     const form = document.getElementById('login-form');
     const btn = document.getElementById('btn-login-submit');
-
-    // Initialize Supabase
-    try {
-      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
-      const res = await fetch(`${API_BASE}/api/config/supabase`);
-      let url, anonKey;
-      if (res.ok) {
-        const config = await res.json();
-        url = config.url;
-        anonKey = config.anonKey;
-      } else {
-        // Fallback to defaults
-        url = 'https://bcmtpbpniajwvtyftpxs.supabase.co';
-        anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
-      }
-      
-      supabase = createClient(url, anonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-          storageKey: 'recoda-auth-token'
-        }
-      });
-    } catch (err) {
-      console.error('Supabase init failed:', err);
-      // Last resort fallback
-      const url = 'https://bcmtpbpniajwvtyftpxs.supabase.co';
-      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbXRwYnBuaWFqd3Z0eWZ0cHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDIyMTUsImV4cCI6MjA4NjcxODIxNX0.S4-QynZ3aXTzDoMsCN3O23A6zaRADVWRx-CZFeM7dPc';
-      supabase = createClient(url, anonKey, {
-        auth: { storageKey: 'recoda-auth-token' }
-      });
-    }
-
-    if (supabase) {
-        // Check if already logged in
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          window.location.href = 'app.html';
-        }
-    }
 
     const msgEl = document.getElementById('login-msg');
     function showMsg(text, isError) {
@@ -175,6 +134,18 @@
       msgEl.style.background = isError ? 'rgba(255,48,64,0.1)' : 'rgba(0,229,160,0.1)';
       msgEl.style.color = isError ? '#ff6b6b' : '#00e5a0';
       msgEl.style.border = isError ? '1px solid rgba(255,48,64,0.3)' : '1px solid rgba(0,229,160,0.3)';
+    }
+
+    try {
+      supabase = await initSupabaseClient();
+      if (!supabase) {
+        showMsg('Auth service is temporarily unavailable.', true);
+      } else {
+        await redirectIfAuthenticated(supabase, '/app');
+      }
+    } catch (err) {
+      console.error('Supabase init failed:', err);
+      showMsg('Could not initialize login. Please try again.', true);
     }
 
     form.addEventListener('submit', async (e) => {

@@ -5,7 +5,7 @@
  */
 
 import { $ } from './utils.js';
-import { formatTime, formatSize } from './utils.js';
+import { formatTime, formatSize, escapeHtml } from './utils.js';
 import { showToast } from './toast.js';
 import { saveRecording, loadAllRecordings, deleteRecording as dbDelete } from './storage.js';
 import { getSupabase } from './supabase.js';
@@ -45,6 +45,26 @@ export async function addRecording(rec) {
 /** Get all recordings array */
 export function getAllRecordings() {
   return recordings;
+}
+
+/** Mark an in-memory recording as synced and refresh UI */
+export function markRecordingSynced(recordId, filename) {
+  const rec = recordings.find((r) => (recordId != null && r.id === recordId) || (filename && r.filename === filename));
+  if (!rec) return;
+  rec.synced = true;
+  renderRecordings();
+}
+
+/** Upsert an in-memory recording and refresh UI */
+export function upsertRecording(rec) {
+  const idx = recordings.findIndex((r) => r.filename === rec.filename);
+  if (idx === -1) {
+    recordings.push(rec);
+  } else {
+    recordings[idx] = { ...recordings[idx], ...rec };
+  }
+  recordings.sort((a, b) => b.ts - a.ts);
+  renderRecordings();
 }
 
 /** Get total recordings count */
@@ -304,11 +324,12 @@ export function renderRecordings() {
 
   recordings.forEach((r, i) => {
     const fmt = getNativeFormat(r);
+    const safeName = escapeHtml(r.filename);
     const card = document.createElement('div');
     card.className = 'rec-card';
     card.innerHTML = `
       <div class="rec-info">
-        <div class="rec-name">${r.filename}</div>
+        <div class="rec-name">${safeName}</div>
         <div class="rec-meta">
           ${formatTime(r.duration)} · ${formatSize(r.blob ? r.blob.size : r.size)} · ${fmt.toUpperCase()}
           ${r.synced ? ' · <i data-lucide="cloud-check" style="width:12px;height:12px;color:var(--accent);display:inline-block;vertical-align:middle;" title="Synced to cloud"></i>' : ''}
@@ -343,6 +364,7 @@ function renderRecentRecordings() {
   }
 
   recent.forEach((r) => {
+    const safeName = escapeHtml(r.filename);
     const card = document.createElement('div');
     card.className = 'recent-card';
     card.onclick = (e) => {
@@ -358,7 +380,7 @@ function renderRecentRecordings() {
         <i data-lucide="video" style="width:16px;height:16px;color:var(--text-secondary);"></i>
       </div>
       <div class="recent-info">
-        <div class="recent-name">${r.filename}</div>
+        <div class="recent-name">${safeName}</div>
         <div class="recent-meta">${dateStr} · ${formatTime(r.duration)} · ${fmt}</div>
       </div>
       <button class="btn-ghost-sm" style="padding:6px;" title="Play">

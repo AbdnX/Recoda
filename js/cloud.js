@@ -6,8 +6,8 @@
 import { $ } from './utils.js';
 import { getSupabase } from './supabase.js';
 import { showToast } from './toast.js';
-import { loadAllRecordings, saveRecording, markAsSynced } from './storage.js';
-import { renderRecordings, getAllRecordings } from './recordings.js'; // Need to re-render after sync
+import { loadAllRecordings, saveRecording, markAsSynced, existsRecording } from './storage.js';
+import { getAllRecordings, markRecordingSynced, upsertRecording } from './recordings.js';
 
 // DOM refs
 let syncBtn = null;
@@ -118,7 +118,9 @@ async function syncRecordings(token) {
   const payload = localRecs.map(r => ({
     filename: r.filename,
     created_at: r.ts.toISOString(), // ensure ISO string
-    // other fields if needed by backend logic
+    duration: r.duration,
+    size: r.blob?.size || r.size || 0,
+    mime_type: r.mime
   }));
 
   // 2. Call Sync API
@@ -152,27 +154,17 @@ async function syncRecordings(token) {
 
   // 4. Download missing files
   for (const item of toDownload) {
-    await downloadRecording(item);
+    const downloaded = await downloadRecording(item);
+    if (downloaded) {
+      upsertRecording(downloaded);
+    }
   }
-
-  // Refresh UI
-  // Note: renderRecordings is not exported safely for re-use without args?
-  // Actually mappings might change. simpler to reload page? No.
-  // We should reload requests.
-  // But imported renderRecordings works on the exported `recordings` array in recordings.js?
-  // We need to update the array in `recordings.js`.
-  // Ideally `recordings.js` should expose a `refresh()` method that re-loads from DB.
-  
-  // For now, prompt user or auto-refresh?
-  // Or better, let's export `reloadRecordings` from `recordings.js`.
 }
 
 /**
  * Upload a single recording
  */
 async function uploadRecording(rec, token) {
-  const sb = await getSupabase();
-  
   // 1. Get signed upload URL (or use direct upload if policy allows)
   // We'll use the signed URL endpoint we built to be safe
   console.log(`Getting signed URL for ${rec.filename}...`);
@@ -220,6 +212,7 @@ async function uploadRecording(rec, token) {
 
   // 4. Mark as synced locally
   await markAsSynced(rec.id);
+  markRecordingSynced(rec.id, rec.filename);
 }
 
 /**
@@ -227,6 +220,7 @@ async function uploadRecording(rec, token) {
  */
 async function downloadRecording(item) {
   if (!item.downloadUrl) return;
+  if (await existsRecording(item.filename)) return null;
 
   // 1. Fetch Blob
   const res = await fetch(item.downloadUrl);
@@ -238,16 +232,14 @@ async function downloadRecording(item) {
     blob,
     filename: item.filename,
     duration: item.duration || 0, // Backend should return this if we saved it!
-    // Note: Backend 'recordings' table has duration, size, mime_type.
-    // Sync API `toDownload` items come from `select('*')` or similar.
-    // Re-check server.js: it selects 'filename, created_at, id' for diffing.
-    // But for `toDownload`, it pushes `...rec`.
-    // We need to make sure server returns all fields for `toDownload`.
-    
     mime: item.mime_type || blob.type,
     ts: new Date(item.created_at),
-    synced: true
+    synced: true,
+    size: blob.size
   };
 
-  await saveRecording(rec);
+  const id = await saveRecording(rec);
+  rec.id = id;
+  rec.url = URL.createObjectURL(blob);
+  return rec;
 }

@@ -1,12 +1,7 @@
-const { Client } = require('pg');
-
-const connectionString = 'postgresql://postgres.bcmtpbpniajwvtyftpxs:Sumayyah21%40@aws-1-eu-west-1.pooler.supabase.com:5432/postgres';
+const { createPgClient } = require('./db');
 
 async function check() {
-  const client = new Client({
-    connectionString,
-    ssl: { rejectUnauthorized: false }
-  });
+  const client = createPgClient();
 
   try {
     await client.connect();
@@ -19,7 +14,7 @@ async function check() {
       console.log('Creating bucket...');
       await client.query(`
         INSERT INTO storage.buckets (id, name, public) 
-        VALUES ('recordings', 'recordings', true);
+        VALUES ('recordings', 'recordings', false);
       `);
       console.log('Bucket created.');
     }

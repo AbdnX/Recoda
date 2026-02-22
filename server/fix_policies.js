@@ -1,6 +1,4 @@
-const { Client } = require('pg');
-
-const connectionString = 'postgresql://postgres.bcmtpbpniajwvtyftpxs:Sumayyah21%40@aws-1-eu-west-1.pooler.supabase.com:5432/postgres';
+const { createPgClient } = require('./db');
 
 const sql = `
 -- Drop existing policies to ensure clean state
@@ -55,10 +53,7 @@ USING (
 `;
 
 async function fix() {
-  const client = new Client({
-    connectionString,
-    ssl: { rejectUnauthorized: false }
-  });
+  const client = createPgClient();
 
   try {
     await client.connect();

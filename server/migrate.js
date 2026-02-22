@@ -1,22 +1,12 @@
-const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
-
-// Connection string with manual password replacement (better than URL encoding sometimes)
-// Project Ref: bcmtpbpniajwvtyftpxs
-// Password: Sumayyah21@ (URL encoded @ is %40)
-const connectionString = 'postgresql://postgres.bcmtpbpniajwvtyftpxs:Sumayyah21%40@aws-1-eu-west-1.pooler.supabase.com:5432/postgres';
+const { createPgClient } = require('./db');
 
 const sqlPath = path.join(__dirname, '../supabase_schema.sql');
 const sql = fs.readFileSync(sqlPath, 'utf8');
 
 async function migrate() {
-  const client = new Client({
-    connectionString: connectionString,
-    ssl: {
-      rejectUnauthorized: false
-    }
-  });
+  const client = createPgClient();
 
   try {
     console.log('🔗 Connecting to Supabase Database via Pooler...');
@@ -32,7 +22,7 @@ async function migrate() {
     try {
       await client.query(`
         INSERT INTO storage.buckets (id, name, public) 
-        VALUES ('recordings', 'recordings', true)
+        VALUES ('recordings', 'recordings', false)
         ON CONFLICT (id) DO NOTHING;
       `);
       console.log('✅ Storage bucket ensured.');
