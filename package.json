@@ -3,11 +3,11 @@
   "version": "1.0.1",
   "private": true,
   "engines": {
-    "node": "20.x"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "start": "node api/index.js",
-    "build": "echo 'No build step required'",
+    "build": "vite build",
     "lint": "node scripts/lint.cjs",
     "test": "npm run test:api",
     "test:api": "node --test tests/api.test.cjs",
@@ -19,6 +19,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
   }
-
 }

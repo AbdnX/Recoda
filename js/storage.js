@@ -113,6 +113,46 @@ export async function deleteRecording(id) {
 }
 
 /**
+ * Update an existing recording in IndexedDB.
+ * @param {number} id
+ * @param {{ blob?: Blob, filename?: string, duration?: number, mime?: string, ts?: Date, synced?: boolean }} rec
+ * @returns {Promise<void>}
+ */
+export async function updateRecording(id, rec) {
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const getRequest = store.get(id);
+
+    getRequest.onsuccess = () => {
+      const current = getRequest.result;
+      if (!current) {
+        resolve();
+        return;
+      }
+
+      const nextBlob = rec.blob || current.blob;
+      const updated = {
+        ...current,
+        filename: rec.filename ?? current.filename,
+        duration: rec.duration ?? current.duration,
+        mime: rec.mime ?? current.mime,
+        blob: nextBlob,
+        size: nextBlob.size,
+        ts: (rec.ts ? rec.ts.toISOString() : current.ts),
+        synced: typeof rec.synced === 'boolean' ? rec.synced : !!current.synced
+      };
+
+      const putRequest = store.put(updated);
+      putRequest.onsuccess = () => resolve();
+      putRequest.onerror = () => reject(putRequest.error);
+    };
+    getRequest.onerror = () => reject(getRequest.error);
+  });
+}
+
+/**
  * Clear all recordings from IndexedDB.
  * @returns {Promise<void>}
  */

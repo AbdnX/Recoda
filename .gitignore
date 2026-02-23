@@ -5,3 +5,6 @@ recordings/
 server/recordings/
 server/node_modules
 *.log
+dist/
+dist
+*.tsbuildinfo

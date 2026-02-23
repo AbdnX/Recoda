@@ -936,6 +936,61 @@ body.state-saving .progress-fill { animation: progressGrow 1.8s ease forwards; }
 .modal-backdrop { display: none; }
 .modal-backdrop.open { display: flex; }
 
+/* ─── Trim Modal ──────────────────────────────────────────── */
+.trim-modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  width: min(92vw, 760px);
+  position: relative;
+}
+
+.trim-preview-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 14px;
+}
+
+.trim-preview-wrap video {
+  width: 100%;
+  max-height: 340px;
+  display: block;
+}
+
+.trim-row {
+  margin: 10px 0;
+}
+
+.trim-row label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.trim-row input[type="range"] {
+  width: 100%;
+}
+
+.trim-meta-line {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.trim-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
 /* ─── Global Button Reset ──────────────────────────────────── */
 button { cursor: pointer; }
 

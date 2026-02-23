@@ -371,6 +371,37 @@
     </div>
   </div>
 
+  <!-- Trim Modal -->
+  <div class="modal-backdrop" id="trim-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 420; align-items: center; justify-content: center;">
+    <div class="modal-content trim-modal-content">
+      <button id="trim-modal-close" style="position: absolute; top: 20px; right: 20px; background: none; color: var(--text-secondary);">
+        <i data-lucide="x" size="20"></i>
+      </button>
+      <h3 id="trim-file-name" style="font-family: var(--font-display); font-size: 18px; margin-bottom: 8px;">recording.mp4</h3>
+      <p style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-bottom: 14px;">Select start and end points, then export the trimmed clip.</p>
+
+      <div class="trim-preview-wrap">
+        <video id="trim-preview-video" controls preload="metadata"></video>
+      </div>
+
+      <div class="trim-row">
+        <label>Start <span id="trim-start-val">00:00:00</span></label>
+        <input id="trim-range-start" type="range" min="0" max="1" step="1" value="0">
+      </div>
+      <div class="trim-row">
+        <label>End <span id="trim-end-val">00:00:01</span></label>
+        <input id="trim-range-end" type="range" min="1" max="1" step="1" value="1">
+      </div>
+      <div class="trim-meta-line">Output length: <span id="trim-length-val">00:00:01</span></div>
+
+      <div class="trim-actions">
+        <button id="trim-preview-btn" class="btn-pill btn-pill-ghost"><i data-lucide="play" size="14"></i> Preview</button>
+        <button id="trim-cancel" class="btn-pill btn-pill-ghost">Cancel</button>
+        <button id="trim-apply" class="btn-pill btn-pill-accent"><i data-lucide="scissors" size="14"></i> Apply Trim</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Scripts -->
