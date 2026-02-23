@@ -44,15 +44,15 @@ function updateLandingUI(user) {
     if (!href) return;
 
     // Change "Login" or "Signup" links to go directly to App if logged in
-    if (href.includes('/login') || href.includes('/signup') || href.includes('app.html')) {
+    if (href.includes('login.html') || href.includes('signup.html') || href.includes('app.html')) {
       const text = a.textContent.toLowerCase().trim();
       
       if (text.includes('login')) {
         a.textContent = 'Open App';
-        a.setAttribute('href', '/app');
+        a.setAttribute('href', 'app.html');
       } else if (text.includes('sign') || text.includes('started')) {
         a.textContent = 'Open App';
-        a.setAttribute('href', '/app');
+        a.setAttribute('href', 'app.html');
       }
     }
   });
@@ -61,7 +61,7 @@ function updateLandingUI(user) {
   const heroBtn = document.querySelector('.hero-actions .btn-primary');
   if (heroBtn) {
     heroBtn.textContent = 'Open App →';
-    heroBtn.setAttribute('href', '/app');
+    heroBtn.setAttribute('href', 'app.html');
   }
 }
 

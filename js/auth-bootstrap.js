@@ -5,8 +5,18 @@
 
 let createClientLoader = null;
 
-function getApiBase() {
-  return window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+function getApiBases() {
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return [''];
+  }
+
+  return [
+    '',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001'
+  ];
 }
 
 async function getCreateClient() {
@@ -18,15 +28,21 @@ async function getCreateClient() {
 }
 
 export async function fetchSupabaseConfig() {
-  try {
-    const res = await fetch(`${getApiBase()}/api/config/supabase`);
-    if (!res.ok) return null;
-    const cfg = await res.json();
-    if (!cfg?.url || !cfg?.anonKey) return null;
-    return { url: cfg.url, anonKey: cfg.anonKey };
-  } catch (_err) {
-    return null;
+  const apiBases = getApiBases();
+
+  for (const base of apiBases) {
+    try {
+      const res = await fetch(`${base}/api/config/supabase`);
+      if (!res.ok) continue;
+      const cfg = await res.json();
+      if (!cfg?.url || !cfg?.anonKey) continue;
+      return { url: cfg.url, anonKey: cfg.anonKey };
+    } catch (_err) {
+      // Try next candidate base URL.
+    }
   }
+
+  return null;
 }
 
 export async function initSupabaseClient(options = {}) {
@@ -45,7 +61,7 @@ export async function initSupabaseClient(options = {}) {
   });
 }
 
-export async function redirectIfAuthenticated(supabase, targetPath = '/app') {
+export async function redirectIfAuthenticated(supabase, targetPath = 'app.html') {
   if (!supabase) return false;
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {

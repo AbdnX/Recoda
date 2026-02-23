@@ -85,7 +85,7 @@ function setupEvents() {
   // Redirect to standalone login/signup pages
   navLogin?.addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = '/login';
+    window.location.href = 'login.html';
   });
 
   // Logout
