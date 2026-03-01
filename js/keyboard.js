@@ -3,7 +3,7 @@
  */
 
 import { getState } from './state.js';
-import { startRecording, stopRecording, togglePause } from './recorder.js';
+import { stopRecording, togglePause } from './recorder.js';
 
 /** Initialize keyboard shortcuts */
 export function initKeyboardShortcuts() {
@@ -15,17 +15,28 @@ export function initKeyboardShortcuts() {
 
     const state = getState();
 
-    if (e.code === 'Space' && state !== 'idle') {
+    // Space: pause/resume during recording only
+    if (e.code === 'Space' && (state === 'recording' || state === 'paused')) {
       e.preventDefault();
       togglePause();
     }
-    if (e.code === 'Escape' && state !== 'idle') {
-      e.preventDefault();
-      stopRecording();
+
+    // Escape: cancel source picker → idle, or stop active recording
+    if (e.code === 'Escape') {
+      if (state === 'source-picker') {
+        e.preventDefault();
+        // Go back to idle by clicking cancel (or dispatch setState directly)
+        document.getElementById('picker-cancel')?.click();
+      } else if (state === 'recording' || state === 'paused') {
+        e.preventDefault();
+        stopRecording();
+      }
     }
+
+    // R: open source picker from idle (simulates btn-start click to reuse sync logic)
     if (e.code === 'KeyR' && state === 'idle') {
       e.preventDefault();
-      startRecording();
+      document.getElementById('btn-start')?.click();
     }
   });
 }

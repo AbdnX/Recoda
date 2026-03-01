@@ -2,7 +2,7 @@
  * Central state machine.
  * Emits custom events when state changes so other modules can react.
  *
- * States: 'idle' | 'recording' | 'paused'
+ * States: 'idle' | 'source-picker' | 'countdown' | 'recording' | 'paused' | 'saving' | 'done'
  */
 
 const emitter = new EventTarget();
@@ -11,7 +11,7 @@ let currentState = 'idle';
 
 /**
  * Get the current app state.
- * @returns {'idle'|'recording'|'paused'}
+ * @returns {'idle'|'source-picker'|'countdown'|'recording'|'paused'|'saving'|'done'}
  */
 export function getState() {
   return currentState;
@@ -19,7 +19,7 @@ export function getState() {
 
 /**
  * Set the app state and dispatch a 'statechange' event.
- * @param {'idle'|'recording'|'paused'} newState
+ * @param {'idle'|'source-picker'|'countdown'|'recording'|'paused'|'saving'|'done'} newState
  */
 export function setState(newState) {
   const prev = currentState;

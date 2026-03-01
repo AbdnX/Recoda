@@ -83,6 +83,27 @@ export function lockSettings(locked) {
   if (formatSel) formatSel.disabled = locked;
 }
 
+/**
+ * Set the audio source value directly (used by the source picker tiles).
+ * @param {'none'|'mic'|'system'|'both'} value
+ */
+export function setAudioSource(value) {
+  const sel = $('audio-source');
+  if (sel) sel.value = value;
+}
+
+/**
+ * Set the webcam enabled flag directly (used by the source picker tiles).
+ * @param {boolean} enabled
+ */
+export function setWebcamEnabled(enabled) {
+  webcamEnabled = enabled;
+  const toggleEl = $('toggle-webcam');
+  const statusTx = $('webcam-status-text');
+  if (toggleEl) toggleEl.classList.toggle('on', enabled);
+  if (statusTx) statusTx.textContent = enabled ? 'On' : 'Off';
+}
+
 /** Initialize all settings event listeners */
 export function initSettings() {
   const settingsToggle = $('settings-toggle');

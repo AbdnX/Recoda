@@ -105,19 +105,19 @@
 
           <!-- UI RESTYLE: Source Toggles (Mapped to existing settings logic) -->
           <div class="source-chips">
-            <div class="chip active">
+            <div class="chip active" id="chip-screen">
               <i data-lucide="monitor" size="11"></i>
               <span>Screen</span>
             </div>
-            <div class="chip active">
+            <div class="chip active" id="chip-mic">
               <i data-lucide="mic" size="11"></i>
               <span>Mic</span>
             </div>
-            <div class="chip">
+            <div class="chip" id="chip-camera">
               <i data-lucide="video" size="11"></i>
               <span>Camera</span>
             </div>
-            <div class="chip">
+            <div class="chip" id="chip-system">
               <i data-lucide="volume-2" size="11"></i>
               <span>System</span>
             </div>
@@ -141,8 +141,58 @@
 
         </div>
 
+        <!-- Screen 2 - Source Picker -->
+        <div class="source-picker" id="source-picker">
+          <div class="stepper">
+            <span class="step done"></span>
+            <span class="step active"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+          </div>
+          <h2 class="picker-title">Choose your sources</h2>
+          <p class="picker-sub">Select what you want to capture</p>
+          <div class="picker-grid">
+            <button class="picker-tile active" id="picker-screen" disabled>
+              <i data-lucide="monitor" style="width:28px;height:28px;"></i>
+              <span class="tile-label">Screen</span>
+              <span class="tile-sub">Always required</span>
+            </button>
+            <button class="picker-tile" id="picker-mic">
+              <i data-lucide="mic" style="width:28px;height:28px;"></i>
+              <span class="tile-label">Microphone</span>
+              <span class="tile-sub">Voice narration</span>
+            </button>
+            <button class="picker-tile" id="picker-camera">
+              <i data-lucide="video" style="width:28px;height:28px;"></i>
+              <span class="tile-label">Camera</span>
+              <span class="tile-sub">Webcam PiP</span>
+            </button>
+            <button class="picker-tile" id="picker-system">
+              <i data-lucide="volume-2" style="width:28px;height:28px;"></i>
+              <span class="tile-label">System Audio</span>
+              <span class="tile-sub">Tab &amp; app sounds</span>
+            </button>
+          </div>
+          <div class="picker-summary" id="picker-summary">Screen selected</div>
+          <div class="picker-footer">
+            <button class="btn-pill btn-pill-ghost" id="picker-cancel">Cancel</button>
+            <button class="btn-pill btn-pill-accent" id="picker-start">
+              <i data-lucide="circle" fill="currentColor" style="width:10px;height:10px;"></i>
+              <span>Start Recording</span>
+            </button>
+          </div>
+        </div>
+
         <!-- UI RESTYLE: Screen 4 - Active Recording (Hidden by default) -->
         <div class="recording-layout">
+          <div class="stepper">
+            <span class="step done"></span>
+            <span class="step done"></span>
+            <span class="step done"></span>
+            <span class="step active"></span>
+            <span class="step"></span>
+          </div>
           <div class="recording-bar">
             <div class="rec-indicator">
               <div class="rec-dot-blink"></div>
@@ -193,6 +243,13 @@
 
         <!-- UI RESTYLE: Screen 6 - Done / Saved (Appears inside Home View after stop) -->
         <div id="done-view" class="done-card" style="display: none;">
+          <div class="stepper stepper-done">
+            <span class="step done"></span>
+            <span class="step done"></span>
+            <span class="step done"></span>
+            <span class="step done"></span>
+            <span class="step active done"></span>
+          </div>
           <div class="done-preview">
             <div class="play-frosted"><i data-lucide="play" fill="currentColor" size="20" style="margin-left: 3px;"></i></div>
             <div class="check-badge"><i data-lucide="check" size="14"></i></div>
@@ -327,6 +384,13 @@
 
   <!-- UI RESTYLE: Screen 3 - Countdown Overlay -->
   <div id="countdown-overlay" class="countdown-overlay">
+    <div class="stepper">
+      <span class="step done"></span>
+      <span class="step done"></span>
+      <span class="step active"></span>
+      <span class="step"></span>
+      <span class="step"></span>
+    </div>
     <div class="countdown-visual">
       <svg class="countdown-ring" width="140" height="140">
         <circle class="ring-bg" cx="70" cy="70" r="62"></circle>
@@ -340,6 +404,13 @@
 
   <!-- UI RESTYLE: Screen 5 - Saving Overlay (Added as decorative state) -->
   <div id="saving-overlay" class="saving-overlay">
+    <div class="stepper">
+      <span class="step done"></span>
+      <span class="step done"></span>
+      <span class="step done"></span>
+      <span class="step done"></span>
+      <span class="step active"></span>
+    </div>
     <div class="spinner"></div>
     <h3 class="saving-title">Saving recording…</h3>
     <div class="saving-status" id="saving-status">Mixing streams...</div>
@@ -407,45 +478,13 @@
   <!-- Scripts -->
   <script type="module" src="js/app.js"></script>
   <script>
-    // State class management: apply body classes based on status label text
-    const observer = new MutationObserver(() => {
-      const statusLabel = document.getElementById('status-label');
-      const doneView = document.getElementById('done-view');
-      const isDone = doneView && doneView.style.display !== 'none';
-      
-      if (statusLabel) {
-        const stateText = statusLabel.textContent.toLowerCase();
-        document.body.classList.remove('state-idle', 'state-recording', 'state-paused', 'state-saving', 'state-done');
-        
-        if (stateText === 'ready') {
-          if (isDone) document.body.classList.add('state-done');
-          else document.body.classList.add('state-idle');
-        } else if (stateText === 'recording') {
-          document.body.classList.add('state-recording');
-        } else if (stateText === 'paused') {
-          document.body.classList.add('state-paused');
-        } else if (stateText.includes('saving')) {
-          document.body.classList.add('state-saving');
-        }
-      }
-    });
-    
-    const statusLabel = document.getElementById('status-label');
-    const doneView = document.getElementById('done-view');
-    if (statusLabel) observer.observe(statusLabel, { characterData: true, childList: true, subtree: true });
-    if (doneView) observer.observe(doneView, { attributes: true, attributeFilter: ['style', 'class'] });
-
-    // Handle "Record another" — reset done-view and reload
+    // Handle "Record another" — reload to reset all module state cleanly
     document.getElementById('btn-record-another')?.addEventListener('click', (e) => {
       e.preventDefault();
-      const dv = document.getElementById('done-view');
-      if (dv) { dv.style.display = 'none'; dv.classList.remove('active'); }
-      document.body.classList.remove('state-done');
-      document.body.classList.add('state-idle');
       window.location.hash = '#home';
       window.location.reload();
     });
-    
+
     // Fallback icon init
     if (window.lucide) lucide.createIcons();
   </script>
