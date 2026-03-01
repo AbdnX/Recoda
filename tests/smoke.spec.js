@@ -1,8 +1,11 @@
-const { test, expect } = require('playwright/test');
+const { test, expect } = require('@playwright/test');
 
 test('landing page renders primary CTA and waitlist', async ({ page }) => {
   await page.goto('/index.html');
-  await expect(page.getByRole('link', { name: /Start Free Trial/i })).toBeVisible();
+  // Primary hero CTA
+  await expect(page.getByRole('link', { name: /Start recording free/i })).toBeVisible();
+  // Pricing plan CTA
+  await expect(page.getByRole('link', { name: /Start free trial/i })).toBeVisible();
   await expect(page.locator('#waitlist-form')).toBeVisible();
 });
 

@@ -8,3 +8,5 @@ server/node_modules
 dist/
 dist
 *.tsbuildinfo
+.claude/
+test-results/
