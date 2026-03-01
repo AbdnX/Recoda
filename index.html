@@ -3,163 +3,232 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>Recoda — Record your screen. Keep it yours.</title>
   <meta name="description" content="Recoda runs entirely in your browser. No installs, no uploads, no compromises. The screen recorder for serious teams.">
   <meta name="theme-color" content="#080808">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23ff3040'/%3E%3Ctext x='50' y='72' font-size='60' font-weight='800' fill='white' text-anchor='middle' font-family='sans-serif'%3ER%3C/text%3E%3C/svg%3E">
-  
-  <!-- Open Graph -->
+
   <meta property="og:title" content="Recoda — The Private, Browser-Native Screen Recorder">
   <meta property="og:description" content="No installs. No uploads. Your recordings stay on your machine.">
-  <meta property="og:image" content="/css/og-preview.png">
-  
-  <!-- Fonts -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/marketing.css">
-  
-  <!-- Icons -->
   <script src="https://unpkg.com/lucide@0.344.0"></script>
 </head>
 <body>
 
-  <!-- 1. Navigation -->
-  <nav class="navbar">
-    <div class="container nav-container">
-      <a href="#" class="logo">
-        <span class="logo-dot">●</span>Recoda
+  <!-- ── NAV ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="nav-logo-mark">R</span>
+        <span class="nav-logo-text">Recoda</span>
       </a>
-      
+
       <div class="nav-links desktop-only">
         <a href="#features">Features</a>
-        <a href="#how-it-works">How it Works</a>
+        <a href="#how-it-works">How it works</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </div>
 
       <div class="nav-actions desktop-only">
-        <a href="login.html" class="btn btn-ghost">Login</a>
-        <a href="signup.html" class="btn btn-primary">Sign up</a>
+        <a href="login.html" class="nav-btn-ghost">Login</a>
+        <a href="signup.html" class="nav-btn-primary">Get started</a>
       </div>
 
-      <button class="menu-toggle mobile-only" aria-label="Toggle menu">
+      <button class="nav-hamburger mobile-only" id="menu-toggle" aria-label="Open menu">
         <i data-lucide="menu"></i>
       </button>
-
     </div>
-    
-    <!-- Mobile Menu -->
-    <div class="mobile-menu mobile-only">
+
+    <div class="mobile-menu" id="mobile-menu">
       <a href="#features">Features</a>
-      <a href="#how-it-works">How it Works</a>
+      <a href="#how-it-works">How it works</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html" class="btn btn-primary">Sign up</a>
+      <div class="mobile-menu-actions">
+        <a href="login.html" class="nav-btn-ghost">Login</a>
+        <a href="signup.html" class="nav-btn-primary">Get started</a>
+      </div>
     </div>
-
   </nav>
 
   <main>
-    <!-- 2. Hero Section -->
-    <section id="hero" class="hero-section">
-      <div class="container hero-container">
-        <div class="hero-content">
-          <div class="overline">No installs. No uploads. No compromises.</div>
-          <h1 class="hero-title">Record your screen.<br>Keep it yours.</h1>
-          <p class="hero-subtitle">
-            Recoda runs entirely in your browser, saves recordings directly to your machine, and never touches a server. Built for founders, developers, and remote teams who move fast.
-          </p>
-          
-          <div class="hero-actions">
-            <a href="signup.html" class="btn btn-primary btn-lg btn-glow">
-              Sign up
-            </a>
-            <a href="#how-it-works" class="btn btn-ghost btn-lg">
-              See How It Works
-            </a>
-          </div>
+
+    <!-- ── HERO ── -->
+    <section class="hero" id="hero">
+      <div class="hero-glow-top" aria-hidden="true"></div>
+
+      <div class="container hero-inner">
+
+        <div class="hero-badge reveal">
+          <span class="badge-dot"></span>
+          Early access — free for the first 1,000 users
         </div>
 
-        <div class="hero-visual">
-          <div class="hero-glow"></div>
-          <!-- Stylized Code Art UI -->
-          <div class="ui-mockup">
-            <div class="ui-header">
-              <div class="ui-dots">
-                <span></span><span></span><span></span>
+        <h1 class="hero-title reveal reveal-d1">
+          Record your screen.<br>Keep it <em>yours.</em>
+        </h1>
+
+        <p class="hero-sub reveal reveal-d2">
+          Browser-native. No installs, no cloud. Recordings land directly on your machine — private by default, always.
+        </p>
+
+        <div class="hero-actions reveal reveal-d3">
+          <a href="app.html" class="cta-btn">
+            <span class="cta-dot"></span>
+            Start recording free
+          </a>
+          <a href="#how-it-works" class="ghost-btn">
+            See how it works
+            <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+          </a>
+        </div>
+
+        <!-- Simulated app preview -->
+        <div class="hero-preview reveal reveal-d4">
+          <div class="preview-glow" aria-hidden="true"></div>
+
+          <div class="app-preview">
+            <!-- Sidebar -->
+            <div class="ap-sidebar">
+              <div class="ap-logo">R</div>
+              <div class="ap-nav-item ap-active">
+                <i data-lucide="home" style="width:16px;height:16px;"></i>
               </div>
-              <div class="ui-address-bar">recoda.app/recording...</div>
+              <div class="ap-nav-item">
+                <i data-lucide="folder" style="width:16px;height:16px;"></i>
+              </div>
+              <div class="ap-spacer"></div>
+              <div class="ap-nav-item">
+                <i data-lucide="settings" style="width:16px;height:16px;"></i>
+              </div>
             </div>
-            <div class="ui-body">
-              <div class="ui-waveform">
-                <!-- CSS generated bars -->
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                <div class="bar active"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+
+            <!-- Main -->
+            <div class="ap-main">
+              <div class="ap-topbar">
+                <span class="ap-brand">Recoda <span class="ap-ver">v1.0</span></span>
+                <div class="ap-status">
+                  <span class="ap-dot ap-dot-rec"></span>
+                  <span class="ap-status-text">RECORDING</span>
+                </div>
               </div>
-              <div class="ui-controls">
-                <div class="ui-time">00:02:47</div>
-                <div class="ui-record-dot"></div>
+
+              <div class="ap-body">
+                <div class="ap-rec-bar">
+                  <div class="ap-rec-left">
+                    <div class="ap-rec-blink"></div>
+                    <span class="ap-rec-label">REC</span>
+                  </div>
+                  <div class="ap-timer">00:02:47</div>
+                  <div class="ap-file-size">28.4 MB</div>
+                </div>
+
+                <div class="ap-preview-panel">
+                  <div class="ap-screen-sim">
+                    <div class="ap-screen-bar">
+                      <span style="background:#ff5f57"></span>
+                      <span style="background:#febc2e"></span>
+                      <span style="background:#28c840"></span>
+                    </div>
+                    <div class="ap-screen-body">
+                      <div class="ap-line w75"></div>
+                      <div class="ap-line w55"></div>
+                      <div class="ap-line w90"></div>
+                      <div class="ap-line ap-accent w40"></div>
+                      <div class="ap-line w70"></div>
+                      <div class="ap-line w50"></div>
+                    </div>
+                  </div>
+                  <div class="ap-pip">
+                    <i data-lucide="user" style="width:14px;height:14px;opacity:0.2;"></i>
+                  </div>
+                  <div class="ap-preview-ring"></div>
+                </div>
+
+                <div class="ap-meters-panel">
+                  <div class="ap-meter-row">
+                    <span class="ap-mlbl">MIC</span>
+                    <div class="ap-mtrack"><div class="ap-mfill" style="width:62%"></div></div>
+                  </div>
+                  <div class="ap-meter-row">
+                    <span class="ap-mlbl">SYS</span>
+                    <div class="ap-mtrack"><div class="ap-mfill" style="width:38%"></div></div>
+                  </div>
+                </div>
+
+                <div class="ap-controls-row">
+                  <button class="ap-ctrl-ghost">
+                    <i data-lucide="pause" style="width:13px;height:13px;"></i> Pause
+                  </button>
+                  <button class="ap-ctrl-accent">
+                    <i data-lucide="square" fill="currentColor" style="width:11px;height:11px;"></i> Stop &amp; Save
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- 3. Social Proof -->
-    <section id="trusted-by" class="social-proof">
-      <div class="container">
-        <span class="proof-label">Trusted by teams at</span>
-        <div class="logos-grid">
-          <span class="logo-item">Stripe</span>
-          <span class="logo-item">Vercel</span>
-          <span class="logo-item">Linear</span>
-          <span class="logo-item">Raycast</span>
-          <span class="logo-item">Notion</span>
+    <!-- ── SOCIAL PROOF ── -->
+    <section class="proof-bar">
+      <div class="container proof-inner">
+        <span class="proof-label">Used by teams at</span>
+        <div class="proof-logos">
+          <span>Stripe</span>
+          <span>Vercel</span>
+          <span>Linear</span>
+          <span>Raycast</span>
+          <span>Notion</span>
         </div>
       </div>
     </section>
 
-    <!-- 4. Features -->
-    <section id="features" class="features-section">
+    <!-- ── FEATURES ── -->
+    <section class="features-section" id="features">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header reveal">
+          <div class="section-eyebrow">Features</div>
           <h2>Everything you need.<br>Nothing you don't.</h2>
         </div>
-        
+
         <div class="features-grid">
-          <div class="feature-card">
-            <i data-lucide="video" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="monitor" class="feat-icon"></i></div>
             <h3>Browser-Native</h3>
             <p>No app to download. Open Recoda, hit record, and go. Works on any modern browser.</p>
           </div>
-          <div class="feature-card">
-            <i data-lucide="hard-drive" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="hard-drive" class="feat-icon"></i></div>
             <h3>100% Local Storage</h3>
             <p>Your recordings never touch our servers. Files go straight to your machine, always.</p>
           </div>
-          <div class="feature-card">
-            <i data-lucide="mic" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="mic" class="feat-icon"></i></div>
             <h3>Mic + System Audio</h3>
             <p>Capture your voice, system sound, or both — mixed cleanly into a single track.</p>
           </div>
-          <div class="feature-card">
-            <i data-lucide="zap" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="zap" class="feat-icon"></i></div>
             <h3>Zero Setup</h3>
-            <p>No accounts required to start recording. Sign up only when you want to save your library.</p>
+            <p>No accounts required to start. Sign up only when you want a persistent library.</p>
           </div>
-          <div class="feature-card">
-            <i data-lucide="library" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="folder" class="feat-icon"></i></div>
             <h3>Persistent Library</h3>
-            <p>Every recording is logged and remembered in your browser. Come back days later intact.</p>
+            <p>Every recording is logged in your browser. Come back days later and it's all there.</p>
           </div>
-          <div class="feature-card">
-            <i data-lucide="camera" class="feature-icon"></i>
+          <div class="feat-card reveal">
+            <div class="feat-icon-wrap"><i data-lucide="video" class="feat-icon"></i></div>
             <h3>Webcam Overlay</h3>
             <p>Add a picture-in-picture camera feed to your recording with one click.</p>
           </div>
@@ -167,176 +236,181 @@
       </div>
     </section>
 
-    <!-- 5. How It Works -->
-    <section id="how-it-works" class="how-section">
+    <!-- ── HOW IT WORKS ── -->
+    <section class="how-section" id="how-it-works">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header reveal">
+          <div class="section-eyebrow">How it works</div>
           <h2>From zero to recorded<br>in three steps</h2>
         </div>
 
-        <div class="steps-flow">
-          <div class="step-item">
+        <div class="steps-row">
+          <div class="step reveal">
             <div class="step-num">01</div>
-            <h3>Open Recoda</h3>
-            <p>No download, no login. Just open the URL and you're ready.</p>
+            <div class="step-body">
+              <h3>Open Recoda</h3>
+              <p>No download, no login. Just open the URL and you're ready.</p>
+            </div>
           </div>
-          <div class="step-line"></div>
-          <div class="step-item">
+          <div class="step-connector" aria-hidden="true"></div>
+          <div class="step reveal">
             <div class="step-num">02</div>
-            <h3>Choose Source</h3>
-            <p>Pick your screen, window, or tab. Add mic or system audio.</p>
+            <div class="step-body">
+              <h3>Choose Sources</h3>
+              <p>Pick screen, window, or tab. Add mic or system audio.</p>
+            </div>
           </div>
-          <div class="step-line"></div>
-          <div class="step-item">
+          <div class="step-connector" aria-hidden="true"></div>
+          <div class="step reveal">
             <div class="step-num">03</div>
-            <h3>Hit Record</h3>
-            <p>When you stop, the file lands on your machine instantly.</p>
+            <div class="step-body">
+              <h3>Hit Record</h3>
+              <p>When you stop, the file lands on your machine instantly.</p>
+            </div>
           </div>
         </div>
 
-        <div class="center-cta">
-          <a href="app.html" class="btn btn-primary btn-lg">Try it now — it's free</a>
+        <div class="how-cta reveal">
+          <a href="app.html" class="cta-btn">Try it now — it's free</a>
         </div>
       </div>
     </section>
 
-    <!-- 6. Pricing -->
-    <section id="pricing" class="pricing-section">
+    <!-- ── PRICING ── -->
+    <section class="pricing-section" id="pricing">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header reveal">
+          <div class="section-eyebrow">Pricing</div>
           <h2>Simple pricing.<br>No surprises.</h2>
         </div>
 
         <div class="pricing-grid">
-          <!-- Free -->
-          <div class="pricing-card">
-            <div class="card-header">
-              <h3>Free</h3>
-              <div class="price">$0<span>/mo</span></div>
+          <div class="plan-card reveal">
+            <div class="plan-header">
+              <div class="plan-name">Free</div>
+              <div class="plan-price">$0<span>/mo</span></div>
             </div>
-            <ul class="features-list">
-              <li><i data-lucide="check"></i> Unlimited recordings</li>
-              <li><i data-lucide="check"></i> Local storage only</li>
-              <li><i data-lucide="check"></i> Up to 30 min per recording</li>
-              <li><i data-lucide="check"></i> 7-day history</li>
+            <ul class="plan-features">
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Unlimited recordings</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Local storage only</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Up to 30 min per session</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> 7-day history</li>
             </ul>
-            <a href="signup.html" class="btn btn-ghost full-width">Sign up for Free</a>
+            <a href="signup.html" class="plan-btn-ghost">Sign up for free</a>
           </div>
 
-          <!-- Pro -->
-          <div class="pricing-card pro active">
-            <div class="popular-badge">Most Popular</div>
-            <div class="card-header">
-              <h3>Pro</h3>
-              <div class="price">$9<span>/mo</span></div>
+          <div class="plan-card plan-card-pro reveal">
+            <div class="plan-badge">Most Popular</div>
+            <div class="plan-header">
+              <div class="plan-name">Pro</div>
+              <div class="plan-price">$9<span>/mo</span></div>
             </div>
-            <ul class="features-list">
-              <li><i data-lucide="check"></i> Everything in Free</li>
-              <li><i data-lucide="check"></i> Unlimited recording length</li>
-              <li><i data-lucide="check"></i> Persistent library, forever</li>
-              <li><i data-lucide="check"></i> Webcam overlay</li>
-              <li><i data-lucide="check"></i> Custom save folders</li>
+            <ul class="plan-features">
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Everything in Free</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Unlimited recording length</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Persistent library, forever</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Webcam overlay</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Custom save folders</li>
             </ul>
-            <a href="#waitlist" class="btn btn-primary full-width">Start Free Trial</a>
+            <a href="#waitlist" class="plan-btn-accent">Start free trial</a>
           </div>
 
-          <!-- Team -->
-          <div class="pricing-card">
-            <div class="card-header">
-              <h3>Team</h3>
-              <div class="price">$29<span>/mo</span></div>
+          <div class="plan-card reveal">
+            <div class="plan-header">
+              <div class="plan-name">Team</div>
+              <div class="plan-price">$29<span>/mo</span></div>
             </div>
-            <ul class="features-list">
-              <li><i data-lucide="check"></i> Everything in Pro</li>
-              <li><i data-lucide="check"></i> Up to 10 seats</li>
-              <li><i data-lucide="check"></i> Shared team library</li>
-              <li><i data-lucide="check"></i> Priority support</li>
+            <ul class="plan-features">
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Everything in Pro</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Up to 10 seats</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Shared team library</li>
+              <li><i data-lucide="check" style="width:14px;height:14px;"></i> Priority support</li>
             </ul>
-            <button class="btn btn-ghost full-width">Contact Us</button>
+            <button class="plan-btn-ghost">Contact us</button>
           </div>
         </div>
-        
-        <p class="pricing-note">All plans start with a 14-day free trial. No credit card required.</p>
+
+        <p class="pricing-note reveal">All plans include a 14-day free trial. No credit card required.</p>
       </div>
     </section>
 
-    <!-- 7. Waitlist -->
-    <section id="waitlist" class="waitlist-section">
-      <div class="container waitlist-container">
-        <div class="glow-bg"></div>
-        <div class="waitlist-content">
-          <h2>Be first when we launch.</h2>
-          <p>Recoda is in early access. Join the waitlist and get 3 months of Pro free at launch.</p>
-          
-          <form id="waitlist-form" class="waitlist-form">
-            <input type="email" id="email" placeholder="Enter your email" required>
-            <button type="submit" class="btn btn-primary">Join Waitlist</button>
-          </form>
-          <div id="waitlist-success" class="success-msg" style="display: none;">
-            <i data-lucide="check-circle" style="color: var(--accent-green);"></i>
-            <span>You're on the list. We'll be in touch.</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 8. FAQ -->
-    <section id="faq" class="faq-section">
+    <!-- ── WAITLIST ── -->
+    <section class="waitlist-section" id="waitlist">
       <div class="container">
-        <div class="section-header">
+        <div class="waitlist-card reveal">
+          <div class="waitlist-glow" aria-hidden="true"></div>
+          <div class="waitlist-inner">
+            <div class="section-eyebrow" style="text-align:center;margin-bottom:16px;">Early access</div>
+            <h2>Be first when we launch.</h2>
+            <p>Recoda is in early access. Join the waitlist and get 3 months of Pro free at launch.</p>
+            <form id="waitlist-form" class="waitlist-form">
+              <input type="email" id="email" placeholder="you@company.com" required autocomplete="email">
+              <button type="submit" class="cta-btn">Join waitlist</button>
+            </form>
+            <div id="waitlist-success" class="waitlist-success" style="display:none;">
+              <i data-lucide="check-circle" style="width:18px;height:18px;color:var(--green);"></i>
+              You're on the list. We'll be in touch.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ── -->
+    <section class="faq-section" id="faq">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-eyebrow">FAQ</div>
           <h2>Questions we actually<br>get asked</h2>
         </div>
 
         <div class="accordion">
-          <details>
-            <summary>Does Recoda upload my recordings anywhere? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">No. Recoda runs entirely in your browser. When you finish recording, the file is generated locally and saved to your Downloads folder or local disk. We never see your screen.</div>
+          <details class="reveal">
+            <summary>Does Recoda upload my recordings anywhere? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">No. Recoda runs entirely in your browser. When you finish recording, the file is generated locally and saved to your machine. We never see your screen.</div>
           </details>
-          <details>
-            <summary>What browsers does Recoda support? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">Recoda works on all modern browsers that support the MediaStream Recording API, including Chrome, Edge, Brave, and Firefox. Safari support is limited.</div>
+          <details class="reveal">
+            <summary>What browsers does Recoda support? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">Recoda works on all modern browsers that support the MediaStream Recording API — Chrome, Edge, Brave, and Firefox. Safari support is limited.</div>
           </details>
-          <details>
-            <summary>Can I record system audio without a mic? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">Yes! When choosing your screen source, check the "Share system audio" box. You can capture system sound pure, or mix it with your microphone.</div>
+          <details class="reveal">
+            <summary>Can I record system audio without a mic? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">Yes. When choosing your screen source, check "Share system audio." You can capture system sound alone, or mix it with your microphone.</div>
           </details>
-          <details>
-            <summary>What format are recordings saved in? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">By default, recordings are saved as WebM or MP4 (depending on browser support). These are highly optimized formats perfect for sharing.</div>
+          <details class="reveal">
+            <summary>What format are recordings saved in? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">By default, recordings are saved as WebM or MP4 depending on browser support. Both are highly compressed and perfect for sharing.</div>
           </details>
-          <details>
-            <summary>Is there a recording length limit? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">On the Free plan, recordings are capped at 30 minutes. Pro users can record for as long as their disk space allows.</div>
+          <details class="reveal">
+            <summary>Is there a recording length limit? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">On the Free plan, recordings are capped at 30 minutes. Pro users can record for as long as their disk space allows.</div>
           </details>
-          <details>
-            <summary>How is this different from Loom or OBS? <i data-lucide="chevron-down"></i></summary>
-            <div class="answer">Loom forces you to the cloud. OBS is powerful but complex to set up. Recoda sits in the middle: instant start like Loom, local privacy like OBS, with zero setup.</div>
+          <details class="reveal">
+            <summary>How is this different from Loom or OBS? <i data-lucide="chevron-down" class="faq-chevron"></i></summary>
+            <div class="faq-answer">Loom forces you to the cloud. OBS is powerful but complex. Recoda sits in the middle: instant start like Loom, local privacy like OBS, zero setup.</div>
           </details>
         </div>
       </div>
     </section>
+
   </main>
 
-  <!-- Auth Modal removed (using /login and /signup pages) -->
-
-  <!-- 9. Footer -->
-  <footer>
-    <div class="container footer-container">
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
       <div class="footer-left">
-        <a href="#" class="logo-sm">Recoda</a>
-        <span class="copyright">© 2026 Recoda. Built for people who value their data.</span>
+        <a href="#" class="footer-logo">Recoda</a>
+        <span class="footer-copy">© 2026 Recoda. Built for people who value their data.</span>
       </div>
       <div class="footer-right">
-        <a href="#"><i data-lucide="twitter"></i></a>
-        <a href="#"><i data-lucide="github"></i></a>
+        <a href="#" aria-label="Twitter"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>
+        <a href="#" aria-label="GitHub"><i data-lucide="github" style="width:16px;height:16px;"></i></a>
       </div>
     </div>
   </footer>
 
   <script type="module" src="js/landing.js"></script>
   <script type="module" src="js/landing-auth.js"></script>
-  <script>
-    lucide.createIcons();
-  </script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>
