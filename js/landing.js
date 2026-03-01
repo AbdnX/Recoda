@@ -1,17 +1,36 @@
 /**
  * Interactive logic for Recoda Landing Page.
- * Handles scroll reveal, mobile menu, and waitlist form submission.
+ * Handles scroll reveal, mobile menu, navbar frost, and waitlist form.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initScrollAnimations();
+  initNavbar();
+  initScrollReveal();
   initMobileMenu();
   initWaitlist();
   initFAQ();
 });
 
-// 1. Scroll Reveal Animations
-function initScrollAnimations() {
+// ── 1. Navbar frost on scroll ────────────────────────────────
+function initNavbar() {
+  const navbar = document.querySelector('.navbar');
+  if (!navbar) return;
+  const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+// ── 2. Scroll Reveal ─────────────────────────────────────────
+function initScrollReveal() {
+  // Hero elements get 'visible' immediately after a short delay
+  // so the CSS reveal-d* delays can play on load.
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.hero .reveal').forEach(el => {
+      el.classList.add('visible');
+    });
+  });
+
+  // Everything else fires on intersection
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -19,119 +38,87 @@ function initScrollAnimations() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
+  }, { threshold: 0.12 });
 
-  // Add scroll-reveal class to major sections or elements?
-  // Let's manually select key elements.
-  const hiddenElements = document.querySelectorAll('.feature-card, .step-item, .pricing-card, .logo-item');
-  hiddenElements.forEach((el) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-    observer.observe(el);
+  document.querySelectorAll('.reveal:not(.hero .reveal)').forEach(el => observer.observe(el));
+}
+
+// ── 3. Mobile menu ───────────────────────────────────────────
+function initMobileMenu() {
+  const toggle = document.getElementById('menu-toggle');
+  const menu   = document.getElementById('mobile-menu');
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = menu.classList.toggle('open');
+    // Swap hamburger ↔ X icon
+    const icon = toggle.querySelector('i');
+    if (icon) icon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+    if (window.lucide) lucide.createIcons();
   });
-  
-  // Custom observer callback to apply inline styles for 'visible'
-  // Actually, let's use a class.
-  // We need to inject the .visible class style into CSS or handle it here.
-  // Simpler: Just handle it here.
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-        revealObserver.unobserve(entry.target);
-      }
+
+  // Close menu when a link inside it is clicked
+  menu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      menu.classList.remove('open');
+      const icon = toggle.querySelector('i');
+      if (icon) icon.setAttribute('data-lucide', 'menu');
+      if (window.lucide) lucide.createIcons();
     });
-  }, { threshold: 0.1 });
+  });
+}
 
-  hiddenElements.forEach(el => revealObserver.observe(el));
+// ── 4. Waitlist Form ─────────────────────────────────────────
+function initWaitlist() {
+  const form       = document.getElementById('waitlist-form');
+  const successMsg = document.getElementById('waitlist-success');
+  if (!form) return;
 
-  // Navbar Frost Effect
-  const navbar = document.querySelector('.navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailInput = form.querySelector('#email');
+    const btn        = form.querySelector('button[type="submit"]');
+    const email      = emailInput?.value?.trim();
+
+    if (!email || !btn) return;
+
+    btn.disabled       = true;
+    btn.textContent    = 'Joining...';
+
+    try {
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+      const res = await fetch(`${API_BASE}/api/waitlist`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        form.style.display = 'none';
+        if (successMsg) successMsg.style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
+      } else {
+        btn.disabled    = false;
+        btn.textContent = 'Join waitlist';
+        emailInput.style.borderColor = 'var(--accent)';
+      }
+    } catch {
+      btn.disabled    = false;
+      btn.textContent = 'Join waitlist';
+      emailInput.style.borderColor = 'var(--accent)';
+      emailInput.placeholder = 'Could not connect — try again.';
     }
   });
 }
 
-// 2. Mobile Menu Toggle
-function initMobileMenu() {
-  const toggle = document.querySelector('.menu-toggle');
-  const menu = document.querySelector('.mobile-menu');
-  
-  if (toggle && menu) {
-    toggle.addEventListener('click', () => {
-      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-      // simple toggle. ideally animate height.
-      if (menu.style.display === 'flex') {
-        menu.classList.add('active');
-        toggle.innerHTML = '<i data-lucide="x"></i>';
-      } else {
-        menu.classList.remove('active');
-        toggle.innerHTML = '<i data-lucide="menu"></i>';
-      }
-      if (window.lucide) lucide.createIcons();
-    });
-  }
-}
-
-// 3. Waitlist Form Submission
-function initWaitlist() {
-  const form = document.querySelector('#waitlist-form');
-  const successMsg = document.querySelector('#waitlist-success');
-  
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const emailInput = form.querySelector('#email');
-      const btn = form.querySelector('button');
-      const email = emailInput.value;
-
-      btn.disabled = true;
-      btn.textContent = 'Joining...';
-
-      try {
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
-        const res = await fetch(`${API_BASE}/api/waitlist`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
-
-        if (res.ok) {
-          form.style.display = 'none';
-          successMsg.style.display = 'flex';
-        } else {
-          btn.disabled = false;
-          btn.textContent = 'Join Waitlist';
-          emailInput.style.borderColor = '#ff3040';
-          emailInput.placeholder = 'Something went wrong. Try again.';
-        }
-      } catch (err) {
-        console.error('Waitlist error:', err);
-        btn.disabled = false;
-        btn.textContent = 'Join Waitlist';
-        emailInput.style.borderColor = '#ff3040';
-        emailInput.placeholder = 'Could not connect. Check your connection.';
-      }
-    });
-  }
-}
-
-// 4. FAQ Logic (Already handled by <details>, but add smooth close others?)
+// ── 5. FAQ accordion (only one open at a time) ───────────────
 function initFAQ() {
-  const details = document.querySelectorAll('details');
-  details.forEach(targetDetail => {
-    targetDetail.addEventListener('click', () => {
-      details.forEach(detail => {
-        if (detail !== targetDetail) {
-          detail.removeAttribute('open');
-        }
-      });
+  const all = document.querySelectorAll('details');
+  all.forEach(target => {
+    target.addEventListener('toggle', () => {
+      if (target.open) {
+        all.forEach(other => { if (other !== target) other.removeAttribute('open'); });
+      }
     });
   });
 }
