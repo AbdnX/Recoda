@@ -10,7 +10,7 @@ import { showToast } from './toast.js';
 import { createAnalyser, mixAudioStreams, closeAudio } from './audio.js';
 import { startMeters, stopMeters } from './meters.js';
 import { openWebcam, closeWebcam, getWebcamStream } from './webcam.js';
-import { getSettings, getMime, getConstraints, getVideoBitrate } from './settings.js';
+import { getSettings, getMime, getConstraints, getVideoBitrate, setAudioSource, setWebcamEnabled } from './settings.js';
 import { addRecording, setPreviewRecording } from './recordings.js';
 import { showPreview, showRecordingPreview } from './ui.js';
 
@@ -22,12 +22,17 @@ let combinedStream = null;
 let timerInterval = null;
 let timerSeconds = 0;
 
+// Tracks the "selected" state of source picker tiles (also reflects home chip state)
+let pickerMicActive    = true;   // default: mic on
+let pickerCameraActive = false;  // default: webcam off
+let pickerSystemActive = false;  // default: system audio off
+
 // ─── Timer ──────────────────────────────────────────────────
 
 function startTimer() {
   const timerEl = $('timer');
   if (!timerEl) return;
-  
+
   timerSeconds = 0;
   timerEl.textContent = '00:00:00';
   timerInterval = setInterval(() => {
@@ -61,13 +66,12 @@ function cleanup() {
 // ─── On Stop Handler ────────────────────────────────────────
 
 function onStopped() {
-  const timerEl = $('timer');
-  const mime = mediaRecorder?.mimeType || 'video/webm';
-  const blob = new Blob(chunks, { type: mime });
-  const ext = getFileExtension(mime);
-  const now = new Date();
+  const mime     = mediaRecorder?.mimeType || 'video/webm';
+  const blob     = new Blob(chunks, { type: mime });
+  const ext      = getFileExtension(mime);
+  const now      = new Date();
   const filename = `rec-${getTimestamp(now)}.${ext}`;
-  const url = URL.createObjectURL(blob);
+  const url      = URL.createObjectURL(blob);
   const duration = timerSeconds;
 
   const rec = { blob, url, filename, duration, mime, ts: now };
@@ -75,25 +79,31 @@ function onStopped() {
   setPreviewRecording(rec);
   cleanup();
 
-  // Show recording in preview for instant playback
+  // Populate done-view fields (visibility is driven by CSS state class)
+  const df = $('done-filename'); if (df) df.textContent = filename;
+  const dd = $('done-duration'); if (dd) dd.textContent = formatTime(duration);
+  const ds = $('done-size');     if (ds) ds.textContent = (blob.size / (1024 * 1024)).toFixed(1) + ' MB';
+  const te = $('timer');         if (te) te.textContent = formatTime(duration);
+
+  // Show recording in preview for instant playback in done-view
   showRecordingPreview(url);
 
-  // Show the done-view card with recording info
-  const doneView = $('done-view');
-  const doneFilename = $('done-filename');
-  const doneDuration = $('done-duration');
-  const doneSize = $('done-size');
-
-  if (doneView) {
-    doneView.style.display = 'block';
-    doneView.classList.add('active');
-    if (doneFilename) doneFilename.textContent = filename;
-    if (doneDuration) doneDuration.textContent = formatTime(duration);
-    if (doneSize) doneSize.textContent = (blob.size / (1024 * 1024)).toFixed(1) + ' MB';
+  // Animate saving progress bar then transition to done
+  const fill   = $('saving-progress');
+  const status = $('saving-status');
+  if (fill) {
+    fill.style.transition = 'none';
+    fill.style.width = '0';
+    void fill.offsetWidth; // force reflow so animation re-fires
+    fill.style.transition = 'width 1.4s ease';
+    fill.style.width = '100%';
   }
+  if (status) status.textContent = 'Finalizing...';
 
-  if (timerEl) timerEl.textContent = formatTime(duration);
-  showToast('Recording saved — view in Library or download', 'success', 4000);
+  setTimeout(() => {
+    setState('done');
+    showToast('Recording saved — view in Library or download', 'success', 4000);
+  }, 1500);
 }
 
 // ─── Countdown ──────────────────────────────────────────────
@@ -105,7 +115,7 @@ function onStopped() {
 function runCountdown() {
   const countdownOverlay = $('countdown-overlay');
   const countdownNumber  = $('countdown-number');
-  
+
   if (!countdownOverlay || !countdownNumber) return Promise.resolve();
 
   return new Promise((resolve) => {
@@ -142,24 +152,109 @@ function runCountdown() {
   });
 }
 
+// ─── Picker Helpers ─────────────────────────────────────────
+
+/** Read the current settings selects and sync picker flags + tile classes to match */
+function syncPickerToSettings() {
+  const val = $('audio-source')?.value || 'none';
+  pickerMicActive    = val === 'mic' || val === 'both';
+  pickerSystemActive = val === 'system' || val === 'both';
+  pickerCameraActive = getSettings().webcamEnabled;
+
+  $('picker-mic')   ?.classList.toggle('active', pickerMicActive);
+  $('picker-camera')?.classList.toggle('active', pickerCameraActive);
+  $('picker-system')?.classList.toggle('active', pickerSystemActive);
+
+  $('chip-mic')    ?.classList.toggle('active', pickerMicActive);
+  $('chip-camera') ?.classList.toggle('active', pickerCameraActive);
+  $('chip-system') ?.classList.toggle('active', pickerSystemActive);
+}
+
+/** Write the picker flags back to the settings selects */
+function syncPickerState() {
+  let audioVal = 'none';
+  if (pickerMicActive && pickerSystemActive) audioVal = 'both';
+  else if (pickerMicActive)                   audioVal = 'mic';
+  else if (pickerSystemActive)                audioVal = 'system';
+
+  setAudioSource(audioVal);
+  setWebcamEnabled(pickerCameraActive);
+
+  // Keep home chips in sync with picker
+  $('chip-mic')    ?.classList.toggle('active', pickerMicActive);
+  $('chip-camera') ?.classList.toggle('active', pickerCameraActive);
+  $('chip-system') ?.classList.toggle('active', pickerSystemActive);
+
+  updatePickerSummary();
+}
+
+/** Update the text summary below the picker grid */
+function updatePickerSummary() {
+  const el = $('picker-summary');
+  if (!el) return;
+  const parts = ['Screen'];
+  if (pickerMicActive)    parts.push('Mic');
+  if (pickerCameraActive) parts.push('Camera');
+  if (pickerSystemActive) parts.push('System Audio');
+  el.textContent = parts.join(' + ') + ' selected';
+}
+
 // ─── Public API ─────────────────────────────────────────────
 
 export function initRecorder() {
-  const btnStart = $('btn-start');
-  const btnPause = $('btn-pause');
-  const btnStop  = $('btn-stop');
-
-  btnStart?.addEventListener('click', () => {
-    if (getState() === 'idle') startRecording();
+  // Home CTA → open source picker
+  $('btn-start')?.addEventListener('click', () => {
+    if (getState() === 'idle') {
+      setState('source-picker');
+      syncPickerToSettings();
+      updatePickerSummary();
+    }
   });
 
-  btnPause?.addEventListener('click', () => {
-    togglePause();
+  // Source picker → start recording
+  $('picker-start')?.addEventListener('click', () => {
+    if (getState() === 'source-picker') startRecording();
   });
 
-  btnStop?.addEventListener('click', () => {
-    stopRecording();
+  // Source picker → cancel
+  $('picker-cancel')?.addEventListener('click', () => {
+    if (getState() === 'source-picker') setState('idle');
   });
+
+  // Picker tiles — toggle active state and sync to settings
+  const tileToggle = (id, flag) => {
+    $(id)?.addEventListener('click', () => {
+      if (flag === 'mic')    pickerMicActive    = !pickerMicActive;
+      if (flag === 'camera') pickerCameraActive = !pickerCameraActive;
+      if (flag === 'system') pickerSystemActive = !pickerSystemActive;
+
+      const active = flag === 'mic' ? pickerMicActive
+                   : flag === 'camera' ? pickerCameraActive
+                   : pickerSystemActive;
+      $(id)?.classList.toggle('active', active);
+      syncPickerState();
+    });
+  };
+  tileToggle('picker-mic', 'mic');
+  tileToggle('picker-camera', 'camera');
+  tileToggle('picker-system', 'system');
+
+  // Home chips — same toggle, also syncs back to picker
+  const chipToggle = (id, flag) => {
+    $(id)?.addEventListener('click', () => {
+      if (flag === 'mic')    pickerMicActive    = !pickerMicActive;
+      if (flag === 'camera') pickerCameraActive = !pickerCameraActive;
+      if (flag === 'system') pickerSystemActive = !pickerSystemActive;
+      syncPickerState();
+    });
+  };
+  chipToggle('chip-mic', 'mic');
+  chipToggle('chip-camera', 'camera');
+  chipToggle('chip-system', 'system');
+
+  // Recording controls
+  $('btn-pause')?.addEventListener('click', togglePause);
+  $('btn-stop')?.addEventListener('click', stopRecording);
 }
 
 export async function startRecording() {
@@ -225,7 +320,8 @@ export async function startRecording() {
     mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
     mediaRecorder.onstop = onStopped;
 
-    // ─── 3-second countdown ─────────────────────────────────
+    // ─── 3-second countdown (with proper state) ─────────────
+    setState('countdown');
     await runCountdown();
 
     // Start recording after countdown
@@ -243,6 +339,7 @@ export async function startRecording() {
 
   } catch (err) {
     cleanup();
+    setState('idle');
     if (err.name === 'NotAllowedError' || err.name === 'AbortError') {
       showToast('Screen capture denied. Please allow access to record.', 'error');
     } else {
@@ -264,5 +361,7 @@ export function togglePause() {
 export function stopRecording() {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
   stopTimer();
-  setState('idle');
+  setState('saving');
+  // mediaRecorder.onstop fires onStopped() asynchronously
+  // onStopped() will call setState('done') after processing + 1.5s animation
 }
