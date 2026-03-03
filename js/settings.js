@@ -99,30 +99,22 @@ export function setAudioSource(value) {
 export function setWebcamEnabled(enabled) {
   webcamEnabled = enabled;
   const toggleEl = $('toggle-webcam');
-  const statusTx = $('webcam-status-text');
-  if (toggleEl) toggleEl.classList.toggle('on', enabled);
-  if (statusTx) statusTx.textContent = enabled ? 'On' : 'Off';
+  if (toggleEl) {
+    toggleEl.classList.toggle('on', enabled);
+    toggleEl.setAttribute('aria-checked', String(enabled));
+  }
 }
 
 /** Initialize all settings event listeners */
 export function initSettings() {
-  const settingsToggle = $('settings-toggle');
-  const settingsPanel  = $('settings-panel');
   const toggleWebcamEl = $('toggle-webcam');
-  const webcamStatusTx = $('webcam-status-text');
   const formatSel      = $('output-format');
-
-  // Panel toggle
-  settingsToggle?.addEventListener('click', () => {
-    const open = settingsPanel.classList.toggle('open');
-    settingsToggle.classList.toggle('open', open);
-  });
 
   // Webcam toggle
   toggleWebcamEl?.addEventListener('click', () => {
     webcamEnabled = !webcamEnabled;
     toggleWebcamEl.classList.toggle('on', webcamEnabled);
-    if (webcamStatusTx) webcamStatusTx.textContent = webcamEnabled ? 'On' : 'Off';
+    toggleWebcamEl.setAttribute('aria-checked', String(webcamEnabled));
     if (getState() !== 'idle') {
       if (webcamEnabled) openWebcam();
       else closeWebcam();
@@ -132,11 +124,11 @@ export function initSettings() {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleWebcamEl.click(); }
   });
 
-  // MP4 support check
+  // MP4 support check — disable the option on unsupported browsers
   if (typeof MediaRecorder !== 'undefined' && formatSel) {
     const mp4Opt = formatSel.querySelector('option[value="mp4"]');
     if (mp4Opt && !mp4Supported) {
-      mp4Opt.textContent = 'MP4 (unsupported)';
+      mp4Opt.textContent = 'MP4 (not supported)';
       mp4Opt.disabled = true;
     }
   }

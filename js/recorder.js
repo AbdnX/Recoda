@@ -320,18 +320,19 @@ export async function startRecording() {
     mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
     mediaRecorder.onstop = onStopped;
 
+    // Open webcam BEFORE the countdown while the user gesture from the
+    // getDisplayMedia screen-picker is still fresh — this maximises the
+    // chance that requestPictureInPicture() succeeds automatically.
+    if (settings.webcamEnabled) {
+      await openWebcam();
+    }
+
     // ─── 3-second countdown (with proper state) ─────────────
     setState('countdown');
     await runCountdown();
 
     // Start recording after countdown
     mediaRecorder.start();
-
-    const webcamPip = $('webcam-pip');
-    if (settings.webcamEnabled) {
-       await openWebcam();
-       if (webcamPip) webcamPip.classList.add('visible');
-    }
 
     setState('recording');
     startTimer();
