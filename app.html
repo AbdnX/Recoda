@@ -52,8 +52,8 @@
 
     <div class="sidebar-bottom">
       <a href="#settings" class="nav-item" id="nav-settings">
-        <span class="nav-item-count">(0)</span>
-        <span class="nav-item-label">SETTINGS</span>
+        <i data-lucide="settings" class="nav-item-icon"></i>
+        <span class="nav-item-label">Settings</span>
       </a>
       
       <button class="nav-item" id="user-menu-btn" style="display:none; width: 30px; height: 30px; padding: 0;">
@@ -224,9 +224,6 @@
               <i data-lucide="video-off" style="width: 48px; height: 48px; opacity: 0.1;"></i>
             </div>
             
-            <div id="webcam-pip" class="webcam-pip" style="position: absolute; right: 20px; bottom: 20px; width: 160px; aspect-ratio: 4/3; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: none;">
-              <video id="webcam-video" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-            </div>
           </div>
 
           <!-- UI RESTYLE: VU Meters -->
@@ -258,7 +255,7 @@
         </div>
 
         <!-- UI RESTYLE: Screen 6 - Done / Saved (Appears inside Home View after stop) -->
-        <div id="done-view" class="done-card" style="display: none;">
+        <div id="done-view" class="done-card">
           <div class="stepper stepper-done">
             <span class="step done"></span>
             <span class="step done"></span>
@@ -352,46 +349,72 @@
       <div class="page-inner">
         <header style="margin-bottom: 32px;">
           <h1 style="font-family: var(--font-display); font-size: 28px; font-weight: 700;">Settings</h1>
+          <p style="margin-top: 6px; font-size: 13px; color: var(--text-secondary);">Changes apply to your next recording.</p>
         </header>
 
-        <div style="display: grid; gap: 24px; max-width: 520px;">
-          <div class="settings-group">
-            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Audio Source</label>
-            <select id="audio-source" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
-              <option value="none">None (No Audio)</option>
+        <div class="settings-grid">
+
+          <div class="settings-section-label">Recording</div>
+
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <strong>Audio Source</strong>
+              <p>What audio to capture alongside your screen</p>
+            </div>
+            <select id="audio-source" class="settings-select">
+              <option value="none">No Audio</option>
               <option value="mic">Microphone Only</option>
               <option value="system">System Audio Only</option>
-              <option value="both" selected>Microphone + System</option>
+              <option value="both" selected>Mic + System Audio</option>
             </select>
           </div>
 
-          <div class="settings-group">
-            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Video Quality</label>
-            <select id="video-quality" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
-              <option value="720">720p (Good)</option>
-              <option value="1080" selected>1080p (Best)</option>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <strong>Video Quality</strong>
+              <p>Higher quality increases file size</p>
+            </div>
+            <select id="video-quality" class="settings-select">
+              <option value="720">720p</option>
+              <option value="1080" selected>1080p</option>
             </select>
           </div>
 
-          <div class="settings-group">
-            <label style="display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Output Format</label>
-            <select id="output-format" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); color: #fff; border-radius: 8px;">
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <strong>Output Format</strong>
+              <p>File format saved after each recording</p>
+            </div>
+            <select id="output-format" class="settings-select">
               <option value="auto" selected>Auto-detect</option>
               <option value="mp4">MP4 (AVC/AAC)</option>
               <option value="webm">WebM (VP9/Opus)</option>
             </select>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px;">
-            <div>
-              <strong style="display: block; font-size: 15px; margin-bottom: 4px;">Webcam PiP</strong>
-              <p style="font-size: 12px; color: var(--text-secondary);">Show camera feed in the corner</p>
+          <div class="settings-section-label">Camera</div>
+
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <strong>Webcam PiP</strong>
+              <p>Show your camera in a floating overlay during recording. Drag it anywhere on screen, or click ⊞ to float it across all tabs.</p>
             </div>
-            <button id="toggle-webcam" style="width: 48px; height: 26px; border-radius: 13px; background: var(--bg-elevated); border: 1px solid var(--border); position: relative; cursor: pointer;">
-              <span style="position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #555; top: 2px; left: 2px; transition: all 0.2s;"></span>
-              <span id="webcam-status-text" style="display: none;">Off</span>
+            <button id="toggle-webcam" class="settings-toggle" role="switch" aria-checked="false">
+              <span class="settings-toggle-thumb"></span>
+              <span id="webcam-status-text" class="sr-only">Off</span>
             </button>
           </div>
+
+          <div class="settings-section-label">About</div>
+
+          <div class="settings-row settings-row-last">
+            <div class="settings-row-info">
+              <strong>Recoda</strong>
+              <p>Browser-native screen recorder — everything stays on your machine.</p>
+            </div>
+            <span class="settings-version">v1.0.0</span>
+          </div>
+
         </div>
       </div>
     </section>
@@ -486,6 +509,19 @@
         <button id="trim-cancel" class="btn-pill btn-pill-ghost">Cancel</button>
         <button id="trim-apply" class="btn-pill btn-pill-accent"><i data-lucide="scissors" size="14"></i> Apply Trim</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Floating webcam PiP — body-level so it can float anywhere on screen -->
+  <div id="webcam-pip" class="webcam-pip">
+    <div class="webcam-drag-handle" title="Drag to move">
+      <i data-lucide="grip-horizontal" style="width:12px;height:12px;opacity:0.6;"></i>
+    </div>
+    <video id="webcam-video" autoplay muted playsinline></video>
+    <div class="webcam-pip-overlay">
+      <button id="btn-webcam-float" class="webcam-float-btn" title="Float camera across all tabs">
+        <i data-lucide="picture-in-picture-2" style="width:11px;height:11px;"></i>
+      </button>
     </div>
   </div>
 
