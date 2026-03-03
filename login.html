@@ -4,145 +4,330 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — Recoda</title>
+  <meta name="theme-color" content="#050505">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23ff3040'/%3E%3Ctext x='50' y='72' font-size='60' font-weight='800' fill='white' text-anchor='middle' font-family='sans-serif'%3ER%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/marketing.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@0.344.0"></script>
   <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-base:      #050505;
+      --bg-surface:   #0d0d0d;
+      --bg-elevated:  #161616;
+      --border:       #1c1c1c;
+      --border-hover: #2a2a2a;
+      --text-primary:   #efefef;
+      --text-secondary: #555555;
+      --accent:       #ff3040;
+      --accent-soft:  rgba(255, 48, 64, 0.07);
+      --accent-glow:  rgba(255, 48, 64, 0.2);
+      --green:        #00e5a0;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+    }
+
+    html { height: 100%; }
+
     body {
+      min-height: 100vh;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Top nav ── */
+    .auth-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .auth-nav-logo-mark {
+      width: 30px;
+      height: 30px;
+      background: var(--accent);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      background: var(--bg-base);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      flex-shrink: 0;
     }
-    .auth-page-container {
+    .auth-nav-logo-text {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+    }
+    .auth-nav-link {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .auth-nav-link span { color: var(--accent); font-weight: 600; }
+    .auth-nav-link:hover { color: var(--text-primary); }
+
+    /* ── Main ── */
+    .auth-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background glow */
+    .auth-main::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse at top,
+        rgba(255, 48, 64, 0.08) 0%,
+        transparent 65%);
+      pointer-events: none;
+    }
+
+    /* ── Card ── */
+    .auth-card {
+      position: relative;
       width: 100%;
-      max-width: 400px;
-      padding: 40px;
+      max-width: 420px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      padding: 44px 40px 40px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 40px 80px rgba(0,0,0,0.5);
     }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-tertiary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      margin-bottom: 32px;
-      transition: color 0.2s;
+
+    /* Shimmer line at top of card */
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 48, 64, 0.4), transparent);
+      border-radius: 9999px;
     }
-    .back-link:hover {
-      color: var(--text-primary);
-    }
+
+    /* ── Title ── */
     .auth-title {
-      font-family: var(--font-display);
+      font-family: var(--font-serif);
       font-size: 2rem;
-      font-weight: 800;
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
       margin-bottom: 8px;
-      letter-spacing: -0.02em;
+    }
+    .auth-title em {
+      font-style: italic;
+      color: var(--accent);
     }
     .auth-subtitle {
+      font-size: 0.9rem;
       color: var(--text-secondary);
-      margin-bottom: 32px;
+      margin-bottom: 36px;
+      line-height: 1.6;
     }
-    .form-group {
+
+    /* ── Message banner ── */
+    .auth-msg {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
       margin-bottom: 20px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 18px;
     }
     .form-group label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
+      margin-bottom: 7px;
+      font-size: 0.8rem;
       font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
     }
     .form-group input {
       width: 100%;
-      padding: 12px 16px;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: #fff;
-      font-family: inherit;
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-    .auth-footer {
-      margin-top: 24px;
-      text-align: center;
+      padding: 13px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-hover);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
       font-size: 0.9rem;
-      color: var(--text-tertiary);
+      font-weight: 400;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input::placeholder { color: #333; }
+    .form-group input:focus {
+      border-color: rgba(255, 48, 64, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 48, 64, 0.07);
+    }
+
+    /* ── Submit button ── */
+    .auth-submit {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .auth-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(255, 48, 64, 0.35);
+    }
+    .auth-submit:disabled {
+      opacity: 0.6;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ── Divider ── */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .auth-divider span {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── Footer ── */
+    .auth-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
     }
     .auth-footer a {
       color: var(--accent);
       font-weight: 600;
-      text-decoration: none;
+      transition: opacity 0.2s;
     }
-    .btn-lg {
-      padding: 14px;
-    }
+    .auth-footer a:hover { opacity: 0.8; }
   </style>
 </head>
 <body>
 
-  <div class="auth-page-container">
-    <a href="index.html" class="back-link">
-      <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
-      Back to Home
+  <nav class="auth-nav">
+    <a href="index.html" class="auth-nav-logo">
+      <div class="auth-nav-logo-mark">R</div>
+      <span class="auth-nav-logo-text">Recoda</span>
     </a>
-    
-    <h1 class="auth-title">Welcome Back</h1>
-    <p class="auth-subtitle">Log in to your Recoda account</p>
+    <a href="signup.html" class="auth-nav-link">
+      No account? <span>Sign up free</span>
+    </a>
+  </nav>
 
-    <div id="login-msg" style="display:none; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:0.9rem;"></div>
+  <main class="auth-main">
+    <div class="auth-card">
 
-    <form id="login-form">
-      <div class="form-group">
-        <label for="login-email">Email Address</label>
-        <input type="email" id="login-email" placeholder="you@example.com" required>
+      <h1 class="auth-title">Welcome <em>back.</em></h1>
+      <p class="auth-subtitle">Log in to your Recoda account.</p>
+
+      <div id="login-msg" class="auth-msg"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email address</label>
+          <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit" id="btn-login-submit">Log in</button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Create one free</a>
       </div>
-      <div class="form-group">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" required>
-      </div>
-      <button type="submit" class="btn btn-primary full-width btn-lg" id="btn-login-submit">Log In</button>
-    </form>
 
-    <div class="auth-footer">
-      Don't have an account? <a href="signup.html">Sign up</a>
     </div>
-  </div>
+  </main>
 
   <script type="module">
     import { initSupabaseClient, redirectIfAuthenticated } from '/js/auth-bootstrap.js';
-    
+
     let supabase;
     const form = document.getElementById('login-form');
-    const btn = document.getElementById('btn-login-submit');
-
+    const btn  = document.getElementById('btn-login-submit');
     const msgEl = document.getElementById('login-msg');
+
     function showMsg(text, isError) {
       msgEl.textContent = text;
       msgEl.style.display = 'block';
-      msgEl.style.background = isError ? 'rgba(255,48,64,0.1)' : 'rgba(0,229,160,0.1)';
-      msgEl.style.color = isError ? '#ff6b6b' : '#00e5a0';
-      msgEl.style.border = isError ? '1px solid rgba(255,48,64,0.3)' : '1px solid rgba(0,229,160,0.3)';
+      msgEl.style.background = isError ? 'rgba(255,48,64,0.08)' : 'rgba(0,229,160,0.08)';
+      msgEl.style.color      = isError ? '#ff6b6b' : '#00e5a0';
+      msgEl.style.border     = isError ? '1px solid rgba(255,48,64,0.25)' : '1px solid rgba(0,229,160,0.25)';
     }
+
+    // Respect ?next= param for post-login redirect
+    const nextUrl = new URLSearchParams(window.location.search).get('next') || 'app.html';
 
     try {
       supabase = await initSupabaseClient();
-      if (!supabase) {
-        showMsg('Auth service is temporarily unavailable.', true);
-      } else {
-        await redirectIfAuthenticated(supabase, 'app.html');
-      }
+      if (!supabase) showMsg('Auth service is temporarily unavailable.', true);
+      else await redirectIfAuthenticated(supabase, nextUrl);
     } catch (err) {
       console.error('Supabase init failed:', err);
       showMsg('Could not initialize login. Please try again.', true);
@@ -153,27 +338,24 @@
       if (!supabase) return;
       msgEl.style.display = 'none';
 
-      const email = document.getElementById('login-email').value;
+      const email    = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-      
-      btn.textContent = 'Logging in...';
+
+      btn.textContent = 'Logging in…';
       btn.disabled = true;
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      
+
       if (error) {
         showMsg(error.message, true);
-        btn.textContent = 'Log In';
+        btn.textContent = 'Log in';
         btn.disabled = false;
       } else {
-        window.location.href = 'app.html';
+        window.location.href = nextUrl;
       }
     });
 
-    // Lucide
     lucide.createIcons();
-    
-
   </script>
 </body>
 </html>
