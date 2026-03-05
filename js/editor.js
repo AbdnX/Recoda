@@ -508,7 +508,8 @@ async function loadFFmpeg() {
 
   const { FFmpeg } = await import('@ffmpeg/ffmpeg');
   const { fetchFile, toBlobURL } = await import('@ffmpeg/util');
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+  // Must match installed @ffmpeg/core version in package.json
+  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd';
 
   const ff = new FFmpeg();
   ff.on('progress', ({ progress }) => {
@@ -516,8 +517,8 @@ async function loadFFmpeg() {
   });
 
   await ff.load({
-    coreURL:   await toBlobURL(`${baseURL}/ffmpeg-core.js`,   'text/javascript'),
-    wasmURL:   await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`,   'text/javascript'),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
   });
 
   ffmpegInstance = { ff, fetchFile };
@@ -525,38 +526,48 @@ async function loadFFmpeg() {
   return ffmpegInstance;
 }
 
-function buildFilterChain() {
+/**
+ * Build FFmpeg filter_complex string.
+ * overlayCount = number of PNG overlay inputs (indices 1..overlayCount).
+ * hasAudio = whether to include audio filter.
+ */
+function buildFilterChain(overlayCount, hasAudio) {
   const s   = state.trimStart;
   const e   = state.trimEnd;
   const spd = state.speed;
   const { brightness, contrast, saturation } = state.filters;
 
-  // Text (drawtext) filters
-  const drawtextFilters = state.textOverlays.map((o) => {
-    const x = Math.round(o.x * 1280);
-    const y = Math.round(o.y * 720);
-    const enableClause = o.tEnd !== null
-      ? `:enable='between(t,${(o.tStart - s).toFixed(3)},${(o.tEnd - s).toFixed(3)})'`
-      : '';
-    const safeText = o.text.replace(/'/g, "\\'").replace(/:/g, '\\:');
-    return `,drawtext=text='${safeText}':fontsize=${o.size}:fontcolor=${o.color}:x=${x}:y=${y}${enableClause}`;
-  }).join('');
+  const parts = [];
 
-  const vFilter =
-    `[0:v]trim=start=${s.toFixed(3)}:end=${e.toFixed(3)},setpts=PTS-STARTPTS` +
-    (spd !== 1 ? `,setpts=PTS/${spd}` : '') +
-    `,eq=brightness=${brightness.toFixed(3)}:contrast=${contrast.toFixed(3)}:saturation=${saturation.toFixed(3)}` +
-    drawtextFilters +
-    `[vout]`;
+  // ── Video chain ──────────────────────────────────────────────────
+  let vChain = `[0:v]trim=start=${s.toFixed(3)}:end=${e.toFixed(3)},setpts=PTS-STARTPTS`;
+  if (spd !== 1) vChain += `,setpts=PTS/${spd.toFixed(6)}`;
+  // Only apply eq when something is actually changed
+  if (brightness !== 0 || contrast !== 1 || saturation !== 1) {
+    vChain += `,eq=brightness=${brightness.toFixed(3)}:contrast=${contrast.toFixed(3)}:saturation=${saturation.toFixed(3)}`;
+  }
 
-  // Audio: chain multiple atempo for speeds outside 0.5–2
-  const atempoFilters = buildAtempoChain(spd);
-  const aFilter =
-    `[0:a]atrim=start=${s.toFixed(3)}:end=${e.toFixed(3)},asetpts=PTS-STARTPTS` +
-    atempoFilters +
-    `[aout]`;
+  if (overlayCount === 0) {
+    parts.push(`${vChain}[vout]`);
+  } else {
+    // Label the base video chain output, then chain overlays
+    parts.push(`${vChain}[vbase]`);
+    for (let i = 0; i < overlayCount; i++) {
+      const inLabel  = i === 0 ? 'vbase' : `vov${i - 1}`;
+      const outLabel = i === overlayCount - 1 ? 'vout' : `vov${i}`;
+      parts.push(`[${inLabel}][${i + 1}:v]overlay=0:0:format=auto[${outLabel}]`);
+    }
+  }
 
-  return { vFilter, aFilter };
+  // ── Audio chain ──────────────────────────────────────────────────
+  if (hasAudio) {
+    const atempoFilters = buildAtempoChain(spd);
+    parts.push(
+      `[0:a]atrim=start=${s.toFixed(3)}:end=${e.toFixed(3)},asetpts=PTS-STARTPTS${atempoFilters}[aout]`
+    );
+  }
+
+  return parts.join(';');
 }
 
 function buildAtempoChain(speed) {
@@ -582,23 +593,24 @@ function buildAtempoChain(speed) {
   return filters.join('');
 }
 
-async function renderAnnotationsToFiles(ff, fetchFile) {
-  if (state.annotations.length === 0) return [];
+/**
+ * Render all drawing annotations AND text overlays to PNG files in FFmpeg FS.
+ * Returns array of { fname } in the order they'll be used as overlay inputs.
+ */
+async function renderOverlaysToFiles(ff, fetchFile) {
   const vw = editorVideo.videoWidth  || 1280;
   const vh = editorVideo.videoHeight || 720;
+  const scaleX = vw / (editorCanvas.width  || vw);
+  const scaleY = vh / (editorCanvas.height || vh);
   const written = [];
+  let idx = 0;
 
-  for (let i = 0; i < state.annotations.length; i++) {
-    const ann = state.annotations[i];
-    const oc = new OffscreenCanvas(vw, vh);
-    const ctx = oc.getContext('2d');
+  // Drawing annotations — one PNG per stroke
+  for (const ann of state.annotations) {
     const pts = ann.points;
     if (pts.length < 2) continue;
-
-    // Scale annotation points from canvas display coords to video resolution
-    const scaleX = vw / editorCanvas.width;
-    const scaleY = vh / editorCanvas.height;
-
+    const oc  = new OffscreenCanvas(vw, vh);
+    const ctx = oc.getContext('2d');
     ctx.globalAlpha = ann.opacity;
     ctx.strokeStyle = ann.color;
     ctx.lineWidth   = ann.width * scaleX;
@@ -606,16 +618,33 @@ async function renderAnnotationsToFiles(ff, fetchFile) {
     ctx.lineJoin    = 'round';
     ctx.beginPath();
     ctx.moveTo(pts[0].x * scaleX, pts[0].y * scaleY);
-    for (let j = 1; j < pts.length; j++) {
-      ctx.lineTo(pts[j].x * scaleX, pts[j].y * scaleY);
-    }
+    for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x * scaleX, pts[j].y * scaleY);
     ctx.stroke();
-
-    const blob = await oc.convertToBlob({ type: 'image/png' });
-    const fname = `overlay_${i}.png`;
+    const blob  = await oc.convertToBlob({ type: 'image/png' });
+    const fname = `overlay_${idx++}.png`;
     await ff.writeFile(fname, await fetchFile(blob));
-    written.push({ fname, ann, index: i });
+    written.push({ fname });
   }
+
+  // Text overlays — one PNG per text item (avoids drawtext font dependency)
+  for (const o of state.textOverlays) {
+    const oc  = new OffscreenCanvas(vw, vh);
+    const ctx = oc.getContext('2d');
+    const x   = o.x * vw;
+    const y   = o.y * vh;
+    const fs  = o.size * scaleX;
+    ctx.font        = `bold ${fs}px sans-serif`;
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.lineWidth   = Math.max(2, fs * 0.06);
+    ctx.fillStyle   = o.color;
+    ctx.strokeText(o.text, x, y);
+    ctx.fillText(o.text, x, y);
+    const blob  = await oc.convertToBlob({ type: 'image/png' });
+    const fname = `overlay_${idx++}.png`;
+    await ff.writeFile(fname, await fetchFile(blob));
+    written.push({ fname });
+  }
+
   return written;
 }
 
@@ -629,34 +658,45 @@ export async function exportVideo() {
   try {
     const { ff, fetchFile } = await loadFFmpeg();
 
-    // Write source
     setProgress(8, 'Reading source file…');
     const srcBlob = state.rec.blob || await fetch(state.rec.url).then((r) => r.blob());
     await ff.writeFile('input.webm', await fetchFile(srcBlob));
 
-    // Annotation overlays
-    const overlayFiles = await renderAnnotationsToFiles(ff, fetchFile);
+    setProgress(12, 'Rendering overlays…');
+    const overlayFiles = await renderOverlaysToFiles(ff, fetchFile);
+    const overlayCount = overlayFiles.length;
 
-    // Build filter chain
-    const { vFilter, aFilter } = buildFilterChain();
-    let filterComplex = `${vFilter};${aFilter}`;
+    // Try with audio first; if that fails (no audio stream), retry without
+    let encodeSuccess = false;
+    for (const hasAudio of [true, false]) {
+      try {
+        setProgress(15, hasAudio ? 'Encoding…' : 'Encoding (no audio track)…');
 
-    // Build FFmpeg args
-    const args = ['-i', 'input.webm'];
-    overlayFiles.forEach(({ fname }) => args.push('-i', fname));
+        const filterComplex = buildFilterChain(overlayCount, hasAudio);
+        const args = ['-i', 'input.webm'];
+        overlayFiles.forEach(({ fname }) => args.push('-i', fname));
+        args.push('-filter_complex', filterComplex);
+        args.push('-map', '[vout]');
+        if (hasAudio) args.push('-map', '[aout]');
+        args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', '22');
+        if (hasAudio) args.push('-c:a', 'aac', '-b:a', '128k');
+        args.push('-movflags', '+faststart');
+        args.push('output.mp4');
 
-    args.push('-filter_complex', filterComplex);
-    args.push('-map', '[vout]', '-map', '[aout]');
-    args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', '22');
-    args.push('-c:a', 'aac', '-b:a', '128k');
-    args.push('-movflags', '+faststart');
-    args.push('output.mp4');
+        await ff.exec(args);
+        encodeSuccess = true;
+        break;
+      } catch (encErr) {
+        if (!hasAudio) throw encErr; // both attempts failed — surface error
+        console.warn('Export with audio failed, retrying without:', encErr);
+        try { await ff.deleteFile('output.mp4'); } catch (_) {}
+      }
+    }
 
-    setProgress(15, 'Encoding…');
-    await ff.exec(args);
+    if (!encodeSuccess) throw new Error('Encoding failed');
 
     setProgress(92, 'Saving…');
-    const data = await ff.readFile('output.mp4');
+    const data   = await ff.readFile('output.mp4');
     const outBlob = new Blob([data.buffer], { type: 'video/mp4' });
 
     // Cleanup FS
@@ -664,21 +704,17 @@ export async function exportVideo() {
       await ff.deleteFile('input.webm');
       await ff.deleteFile('output.mp4');
       for (const { fname } of overlayFiles) await ff.deleteFile(fname);
-    } catch (_) { /* non-critical */ }
+    } catch (_) {}
 
-    // Build recording object
     const origName = (state.rec.filename || 'recording').replace(/\.[^.]+$/, '');
-    const newFilename = `${origName}_edited.mp4`;
-    const duration = state.trimEnd - state.trimStart;
-
     const newRec = {
-      filename: newFilename,
-      blob: outBlob,
-      size: outBlob.size,
-      duration,
+      filename: `${origName}_edited.mp4`,
+      blob:     outBlob,
+      size:     outBlob.size,
+      duration: state.trimEnd - state.trimStart,
       mimeType: 'video/mp4',
-      ts: new Date(),
-      synced: false,
+      ts:       new Date(),
+      synced:   false,
     };
 
     setProgress(98, 'Storing…');
@@ -686,7 +722,6 @@ export async function exportVideo() {
 
     setProgress(100, 'Done!');
     showToast('Exported successfully — saved to library', 'success', 3000);
-
     setTimeout(closeEditor, 800);
   } catch (err) {
     console.error('Export failed:', err);
