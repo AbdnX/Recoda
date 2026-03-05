@@ -7,7 +7,7 @@ import { $ } from './utils.js';
 import { getSupabase } from './supabase.js';
 import { showToast } from './toast.js';
 import { loadAllRecordings, saveRecording, markAsSynced, existsRecording } from './storage.js';
-import { getAllRecordings, markRecordingSynced, upsertRecording } from './recordings.js';
+import { getAllRecordings, markRecordingSynced, upsertRecording, renderRecordings } from './recordings.js';
 
 // DOM refs
 let syncBtn = null;
@@ -65,6 +65,54 @@ export function updateSyncButton(recordings) {
     syncBtn.disabled = false;
     syncBtn.title = `Sync ${unsyncedCount} recording${unsyncedCount !== 1 ? 's' : ''}`;
     syncBtn.style.opacity = '1';
+  }
+}
+
+/**
+ * Auto-upload a single recording to Supabase immediately after it is added.
+ * Runs in the background — does not block the UI.
+ * Sets rec.syncing / rec.synced / rec.syncFailed and re-renders the card.
+ */
+export async function autoUploadRecording(rec) {
+  const sb = await getSupabase();
+  if (!sb) return; // cloud not configured
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return; // not logged in — backgroundSync will pick it up on next login
+
+  rec.syncing = true;
+  rec.syncFailed = false;
+  renderRecordings();
+
+  try {
+    await uploadRecording(rec, session.access_token);
+    rec.syncing = false;
+    renderRecordings();
+  } catch (err) {
+    console.warn('[Recoda] Auto-upload failed, will retry on next sync:', err.message);
+    rec.syncing = false;
+    rec.syncFailed = true;
+    renderRecordings();
+  }
+}
+
+/**
+ * Run a full cloud sync silently in the background.
+ * Uploads any locally unsynced recordings and downloads any cloud recordings
+ * not yet in this browser's IndexedDB.
+ * Safe to call on every app start — no-ops if already in sync.
+ */
+export async function backgroundSync() {
+  const sb = await getSupabase();
+  if (!sb) return;
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  try {
+    await syncRecordings(session.access_token);
+  } catch (err) {
+    console.warn('[Recoda] Background sync failed:', err.message);
   }
 }
 
@@ -143,13 +191,22 @@ async function syncRecordings(token) {
   console.log('Sync plan:', { toUpload, toDownload });
 
   // 3. Upload missing files
+  const inMemory = getAllRecordings();
   for (const item of toUpload) {
-    // Find the full local object with blob
     const rec = localRecs.find(r => r.filename === item.filename);
     if (!rec) continue;
 
-    await uploadRecording(rec, token);
-    console.log(`Uploaded ${rec.filename}`);
+    // Reflect uploading state in the UI card
+    const liveRec = inMemory.find(r => r.filename === item.filename);
+    if (liveRec) { liveRec.syncing = true; liveRec.syncFailed = false; renderRecordings(); }
+
+    try {
+      await uploadRecording(rec, token);
+      if (liveRec) { liveRec.syncing = false; renderRecordings(); }
+    } catch (err) {
+      if (liveRec) { liveRec.syncing = false; liveRec.syncFailed = true; renderRecordings(); }
+      throw err;
+    }
   }
 
   // 4. Download missing files

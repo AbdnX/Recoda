@@ -9,7 +9,7 @@ import { formatTime, formatSize, escapeHtml } from './utils.js';
 import { showToast } from './toast.js';
 import { saveRecording, loadAllRecordings, deleteRecording as dbDelete, updateRecording as dbUpdate } from './storage.js';
 import { getSupabase } from './supabase.js';
-import { updateSyncButton } from './cloud.js';
+import { updateSyncButton, autoUploadRecording } from './cloud.js';
 import { openEditor } from './editor.js';
 
 const recordings = [];
@@ -44,9 +44,9 @@ export async function addRecording(rec) {
   recordings.unshift(rec);
   renderRecordings();
 
-  // Auto-save to local server so any browser on this device can access it
-  if (rec.blob && !rec.isLocalServer && !rec.localSaved) {
-    autoSaveToLocal(rec);
+  // Auto-upload to Supabase cloud so recordings persist across all browsers and devices
+  if (rec.blob && !rec.isLocalServer && !rec.synced) {
+    autoUploadRecording(rec);
   }
 }
 
@@ -508,19 +508,7 @@ async function executeDownload() {
   }
 }
 
-// ─── Local Save ───────────────────────────────────────────
-
-/**
- * Auto-save a new recording to the local server silently.
- * Updates rec.localSaved and re-renders on success.
- */
-async function autoSaveToLocal(rec) {
-  const ok = await saveRecordingToLocal(rec, { silent: true });
-  if (ok) {
-    rec.localSaved = true;
-    renderRecordings();
-  }
-}
+// ─── Local Save (localhost companion server only) ──────────
 
 /**
  * Save a recording to the local server.
@@ -654,8 +642,13 @@ export function renderRecordings() {
         <div class="rec-name">${safeName}</div>
         <div class="rec-meta">
           ${formatTime(r.duration)} · ${formatSize(r.blob ? r.blob.size : r.size)} · ${fmt.toUpperCase()}
-          ${r.synced ? ' · <i data-lucide="cloud-check" style="width:12px;height:12px;color:var(--accent);display:inline-block;vertical-align:middle;" title="Synced to cloud"></i>' : ''}
-          ${(r.localSaved || r.isLocalServer) ? ' · <i data-lucide="hard-drive" style="width:12px;height:12px;color:#00e5a0;display:inline-block;vertical-align:middle;" title="Saved to device"></i>' : ''}
+          ${r.syncing
+            ? ' · <i data-lucide="loader-2" style="width:12px;height:12px;color:var(--text-secondary);display:inline-block;vertical-align:middle;animation:spin 1s linear infinite;" title="Uploading to cloud…"></i>'
+            : r.synced
+              ? ' · <i data-lucide="cloud-check" style="width:12px;height:12px;color:var(--green);display:inline-block;vertical-align:middle;" title="Synced to cloud"></i>'
+              : r.syncFailed
+                ? ' · <i data-lucide="cloud-off" style="width:12px;height:12px;color:var(--orange);display:inline-block;vertical-align:middle;" title="Upload failed — will retry on next sync"></i>'
+                : ''}
         </div>
       </div>
       <div class="rec-actions">

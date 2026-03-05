@@ -57,6 +57,7 @@ export async function saveRecording(rec) {
       ts: rec.ts.toISOString(),
       size: rec.blob.size,
       synced: !!rec.synced,
+      syncFailed: !!rec.syncFailed,
     };
     const request = store.add(record);
     request.onsuccess = () => resolve(request.result);
@@ -88,6 +89,7 @@ export async function loadAllRecordings() {
         mime: item.mime,
         ts: new Date(item.ts),
         synced: !!item.synced,
+        syncFailed: !!item.syncFailed,
       }));
       resolve(recordings);
     };
@@ -184,6 +186,7 @@ export async function markAsSynced(id) {
       if (!data) return resolve(); // Record not found, maybe deleted
       
       data.synced = true;
+      data.syncFailed = false;
       const updateRequest = store.put(data);
       
       updateRequest.onsuccess = () => resolve();

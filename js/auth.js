@@ -8,6 +8,7 @@ import { getSupabase } from './supabase.js';
 import { showToast } from './toast.js';
 import { navigateTo, getCurrentPage } from './router.js';
 import { refreshRecordings } from './recordings.js';
+import { backgroundSync } from './cloud.js';
 
 let currentUser = null;
 
@@ -53,6 +54,8 @@ function handleSession(session) {
   
   if (currentUser) {
     refreshRecordings();
+    // Upload any recordings made before login + pull new cloud recordings
+    backgroundSync();
   }
 }
 

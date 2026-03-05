@@ -14,6 +14,7 @@ import { initMeters } from './meters.js';
 import { initRecorder } from './recorder.js';
 import { initKeyboardShortcuts } from './keyboard.js';
 import { initEditor } from './editor.js';
+import { backgroundSync } from './cloud.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize in order
@@ -30,7 +31,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initAuth();
   await initRecordings();
   await initCloud();
-  
+
+  // Background sync: upload any unsynced recordings + pull new cloud recordings.
+  // Non-blocking — runs after UI is ready.
+  backgroundSync();
+
   // Router last to handle deep links/navigation state
   initRouter();
 
