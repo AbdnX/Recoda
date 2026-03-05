@@ -43,6 +43,11 @@ export async function addRecording(rec) {
   }
   recordings.unshift(rec);
   renderRecordings();
+
+  // Auto-save to local server so any browser on this device can access it
+  if (rec.blob && !rec.isLocalServer && !rec.localSaved) {
+    autoSaveToLocal(rec);
+  }
 }
 
 /** Get all recordings array */
@@ -505,49 +510,63 @@ async function executeDownload() {
 
 // ─── Local Save ───────────────────────────────────────────
 
-/** Save a recording to the local library on the server */
-async function saveRecordingToLocal(rec) {
+/**
+ * Auto-save a new recording to the local server silently.
+ * Updates rec.localSaved and re-renders on success.
+ */
+async function autoSaveToLocal(rec) {
+  const ok = await saveRecordingToLocal(rec, { silent: true });
+  if (ok) {
+    rec.localSaved = true;
+    renderRecordings();
+  }
+}
+
+/**
+ * Save a recording to the local server.
+ * silent=true suppresses toasts (used for auto-save).
+ * Returns true on success, false on failure.
+ */
+async function saveRecordingToLocal(rec, { silent = false } = {}) {
   try {
     const sb = await getSupabase();
     if (!sb) {
-      showToast('API not configured', 'error');
-      return;
+      if (!silent) showToast('API not configured', 'error');
+      return false;
     }
 
     const { data: { session } } = await sb.auth.getSession();
     if (!session) {
-      showToast('Please log in to save to local library', 'warning');
-      return;
+      if (!silent) showToast('Please log in to save to local library', 'warning');
+      return false;
     }
 
-    showToast('Saving to local library...', 'info', 0);
+    if (!silent) showToast('Saving to local library...', 'info', 0);
 
     const formData = new FormData();
     formData.append('file', rec.blob, rec.filename);
     formData.append('filename', rec.filename);
     formData.append('duration', rec.duration);
-    formData.append('mime', rec.mime);
+    formData.append('mime', rec.mime || rec.mimeType || 'video/webm');
     formData.append('ts', rec.ts.toISOString());
 
     const res = await fetch(`${API_BASE}/api/local/save`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`
-      },
-      body: formData
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+      body: formData,
     });
 
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Failed to save locally');
     }
 
-    const data = await res.json();
-    showToast(`Successfully saved to local library!`, 'success', 3000);
-    return data;
+    if (!silent) showToast('Saved to local library!', 'success', 3000);
+    return true;
   } catch (err) {
     console.error('Local save error:', err);
-    showToast(err.message, 'error');
+    if (!silent) showToast(err.message, 'error');
+    return false;
   }
 }
 
@@ -636,12 +655,12 @@ export function renderRecordings() {
         <div class="rec-meta">
           ${formatTime(r.duration)} · ${formatSize(r.blob ? r.blob.size : r.size)} · ${fmt.toUpperCase()}
           ${r.synced ? ' · <i data-lucide="cloud-check" style="width:12px;height:12px;color:var(--accent);display:inline-block;vertical-align:middle;" title="Synced to cloud"></i>' : ''}
+          ${(r.localSaved || r.isLocalServer) ? ' · <i data-lucide="hard-drive" style="width:12px;height:12px;color:#00e5a0;display:inline-block;vertical-align:middle;" title="Saved to device"></i>' : ''}
         </div>
       </div>
       <div class="rec-actions">
         <button class="btn-ghost-sm btn-play-rec" data-i="${i}" title="Play"><i data-lucide="play" style="width:14px;height:14px;"></i></button>
         <button class="btn-ghost-sm btn-edit-rec" data-i="${i}" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
-        ${window.location.hostname === 'localhost' ? `<button class="btn-ghost-sm btn-local-rec" data-i="${i}" title="Save to local library"><i data-lucide="hard-drive" style="width:14px;height:14px;"></i></button>` : ''}
         <button class="btn-ghost-sm btn-dl-rec" data-i="${i}" title="Download"><i data-lucide="download" style="width:14px;height:14px;"></i></button>
         <button class="btn-ghost-sm btn-del-rec" data-i="${i}" title="Delete" style="color:var(--accent);"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
       </div>
@@ -812,7 +831,6 @@ function setupListeners() {
       const pb  = e.target.closest('.btn-play-rec');
       const ed  = e.target.closest('.btn-edit-rec');
       const dl  = e.target.closest('.btn-dl-rec');
-      const loc = e.target.closest('.btn-local-rec');
       const del = e.target.closest('.btn-del-rec');
 
       if (pb) {
@@ -826,10 +844,6 @@ function setupListeners() {
       if (dl) {
         const r = recordings[parseInt(dl.dataset.i)];
         if (r) openDownloadModal(r);
-      }
-      if (loc) {
-        const r = recordings[parseInt(loc.dataset.i)];
-        if (r) saveRecordingToLocal(r);
       }
       if (del) {
         const idx = parseInt(del.dataset.i);
