@@ -29,6 +29,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/editor.css">
 
   <script src="https://unpkg.com/lucide@0.344.0"></script>
 </head>
@@ -509,6 +510,190 @@
         <button id="trim-cancel" class="btn-pill btn-pill-ghost">Cancel</button>
         <button id="trim-apply" class="btn-pill btn-pill-accent"><i data-lucide="scissors" size="14"></i> Apply Trim</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Editor Modal -->
+  <div class="modal-backdrop" id="editor-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); z-index:450; align-items:center; justify-content:center;">
+    <div class="editor-modal-content">
+
+      <!-- Header -->
+      <div class="editor-header">
+        <span class="editor-filename" id="editor-filename">recording.webm</span>
+        <div class="editor-header-actions">
+          <button id="editor-modal-close" class="editor-close-btn" title="Close">
+            <i data-lucide="x" size="18"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="editor-toolbar">
+        <button class="editor-tool-btn active" id="editor-tool-trim" data-tool="trim">
+          <i data-lucide="scissors" size="14"></i> Trim
+        </button>
+        <button class="editor-tool-btn" id="editor-tool-text" data-tool="text">
+          <i data-lucide="type" size="14"></i> Text
+        </button>
+        <button class="editor-tool-btn" id="editor-tool-draw" data-tool="draw">
+          <i data-lucide="pen-line" size="14"></i> Draw
+        </button>
+        <button class="editor-tool-btn" id="editor-tool-speed" data-tool="speed">
+          <i data-lucide="gauge" size="14"></i> Speed
+        </button>
+        <button class="editor-tool-btn" id="editor-tool-filters" data-tool="filters">
+          <i data-lucide="sliders-horizontal" size="14"></i> Filters
+        </button>
+      </div>
+
+      <!-- Main Area -->
+      <div class="editor-main">
+
+        <!-- Side Panel -->
+        <div class="editor-side-panel">
+
+          <!-- Trim Panel -->
+          <div class="editor-panel" id="editor-panel-trim">
+            <h4 class="panel-title">Trim</h4>
+            <div class="panel-row">
+              <label>Start <span id="editor-trim-start-val">00:00</span></label>
+              <input type="range" id="editor-trim-start" min="0" max="100" step="0.1" value="0" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>End <span id="editor-trim-end-val">00:00</span></label>
+              <input type="range" id="editor-trim-end" min="0" max="100" step="0.1" value="100" class="editor-slider">
+            </div>
+            <div class="panel-meta">Output: <span id="editor-trim-length">00:00</span></div>
+          </div>
+
+          <!-- Text Panel -->
+          <div class="editor-panel" id="editor-panel-text" style="display:none;">
+            <h4 class="panel-title">Text Overlay</h4>
+            <div class="panel-row">
+              <label>Text</label>
+              <input type="text" id="editor-text-input" class="editor-text-input" placeholder="Enter text…" maxlength="200">
+            </div>
+            <div class="panel-row">
+              <label>Size</label>
+              <input type="range" id="editor-text-size" min="12" max="72" value="28" class="editor-slider">
+              <span id="editor-text-size-val">28px</span>
+            </div>
+            <div class="panel-row">
+              <label>Color</label>
+              <input type="color" id="editor-text-color" value="#ffffff" class="editor-color-input">
+            </div>
+            <div class="panel-row">
+              <label>X %</label>
+              <input type="range" id="editor-text-x" min="0" max="100" value="50" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>Y %</label>
+              <input type="range" id="editor-text-y" min="0" max="100" value="50" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>Start (s)</label>
+              <input type="number" id="editor-text-tstart" min="0" value="0" step="0.1" class="editor-number-input">
+            </div>
+            <div class="panel-row">
+              <label>End (s)</label>
+              <input type="number" id="editor-text-tend" min="0" value="" step="0.1" class="editor-number-input" placeholder="End of video">
+            </div>
+            <button class="editor-add-btn" id="editor-text-add"><i data-lucide="plus" size="13"></i> Add Text</button>
+            <div id="editor-text-list" class="editor-overlay-list"></div>
+          </div>
+
+          <!-- Draw Panel -->
+          <div class="editor-panel" id="editor-panel-draw" style="display:none;">
+            <h4 class="panel-title">Draw</h4>
+            <div class="panel-row">
+              <label>Color</label>
+              <input type="color" id="editor-draw-color" value="#ff3040" class="editor-color-input">
+            </div>
+            <div class="panel-row">
+              <label>Width</label>
+              <input type="range" id="editor-draw-width" min="1" max="20" value="4" class="editor-slider">
+              <span id="editor-draw-width-val">4px</span>
+            </div>
+            <div class="panel-row">
+              <label>Opacity</label>
+              <input type="range" id="editor-draw-opacity" min="10" max="100" value="100" class="editor-slider">
+              <span id="editor-draw-opacity-val">100%</span>
+            </div>
+            <p class="panel-hint">Draw on the video preview. Annotations are stamped at the current playhead time.</p>
+            <button class="editor-add-btn editor-danger-btn" id="editor-draw-clear"><i data-lucide="trash-2" size="13"></i> Clear All</button>
+          </div>
+
+          <!-- Speed Panel -->
+          <div class="editor-panel" id="editor-panel-speed" style="display:none;">
+            <h4 class="panel-title">Playback Speed</h4>
+            <div class="panel-row">
+              <label>Speed <span id="editor-speed-val">1.0×</span></label>
+              <input type="range" id="editor-speed" min="0.25" max="4" step="0.05" value="1" class="editor-slider">
+            </div>
+            <div class="speed-presets">
+              <button class="speed-preset-btn" data-speed="0.5">0.5×</button>
+              <button class="speed-preset-btn" data-speed="1">1×</button>
+              <button class="speed-preset-btn" data-speed="1.5">1.5×</button>
+              <button class="speed-preset-btn" data-speed="2">2×</button>
+            </div>
+            <p class="panel-hint">Note: speeds outside 0.5–2× are achieved by chaining filters during export.</p>
+          </div>
+
+          <!-- Filters Panel -->
+          <div class="editor-panel" id="editor-panel-filters" style="display:none;">
+            <h4 class="panel-title">Color Filters</h4>
+            <div class="panel-row">
+              <label>Brightness <span id="editor-filter-brightness-val">0</span></label>
+              <input type="range" id="editor-filter-brightness" min="-1" max="1" step="0.05" value="0" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>Contrast <span id="editor-filter-contrast-val">1.0</span></label>
+              <input type="range" id="editor-filter-contrast" min="0" max="3" step="0.05" value="1" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>Saturation <span id="editor-filter-saturation-val">1.0</span></label>
+              <input type="range" id="editor-filter-saturation" min="0" max="3" step="0.05" value="1" class="editor-slider">
+            </div>
+            <div class="panel-row">
+              <label>Gamma <span id="editor-filter-gamma-val">1.0</span></label>
+              <input type="range" id="editor-filter-gamma" min="0.1" max="3" step="0.05" value="1" class="editor-slider">
+            </div>
+            <button class="editor-add-btn" id="editor-filter-reset"><i data-lucide="rotate-ccw" size="13"></i> Reset Filters</button>
+          </div>
+
+        </div><!-- /editor-side-panel -->
+
+        <!-- Video Preview Area -->
+        <div class="editor-preview-area">
+          <div class="editor-video-wrap">
+            <video id="editor-video" preload="metadata" playsinline></video>
+            <canvas id="editor-canvas"></canvas>
+          </div>
+          <div class="editor-playback-controls">
+            <button id="editor-play-btn" class="editor-play-btn"><i data-lucide="play" size="16"></i></button>
+            <input type="range" id="editor-timeline" min="0" max="100" step="0.01" value="0" class="editor-timeline">
+            <span id="editor-time-display" class="editor-time-display">0:00 / 0:00</span>
+          </div>
+        </div>
+
+      </div><!-- /editor-main -->
+
+      <!-- Footer -->
+      <div class="editor-footer">
+        <div class="editor-progress-wrap" id="editor-progress-wrap" style="display:none;">
+          <div class="editor-progress-bar">
+            <div class="editor-progress-fill" id="editor-progress-fill"></div>
+          </div>
+          <span class="editor-progress-label" id="editor-progress-label">Processing…</span>
+        </div>
+        <div class="editor-footer-actions">
+          <button id="editor-cancel-btn" class="btn-pill btn-pill-ghost">Cancel</button>
+          <button id="editor-export-btn" class="btn-pill btn-pill-accent">
+            <i data-lucide="download" size="14"></i> Export
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

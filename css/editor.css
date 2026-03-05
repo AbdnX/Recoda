@@ -1,0 +1,394 @@
+/* ─── Editor Modal ─────────────────────────────────────────────────────────── */
+
+#editor-modal {
+  display: none;
+}
+#editor-modal.open {
+  display: flex !important;
+}
+
+.editor-modal-content {
+  background: var(--bg-surface, #111);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 16px;
+  width: min(960px, 96vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+
+/* Header */
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+  flex-shrink: 0;
+}
+.editor-filename {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: var(--text-secondary, #999);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+.editor-header-actions {
+  display: flex;
+  gap: 8px;
+}
+.editor-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #999);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+.editor-close-btn:hover {
+  color: var(--text-primary, #fff);
+  background: rgba(255,255,255,0.08);
+}
+
+/* Toolbar */
+.editor-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+  flex-shrink: 0;
+}
+.editor-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border, #2a2a2a);
+  background: none;
+  color: var(--text-secondary, #999);
+  font-size: 13px;
+  font-family: var(--font-body, sans-serif);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.editor-tool-btn:hover {
+  color: var(--text-primary, #fff);
+  background: rgba(255,255,255,0.06);
+}
+.editor-tool-btn.active {
+  background: var(--accent, #ff3040);
+  border-color: var(--accent, #ff3040);
+  color: #fff;
+}
+
+/* Main 2-column layout */
+.editor-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Side Panel */
+.editor-side-panel {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border, #2a2a2a);
+  overflow-y: auto;
+  padding: 16px;
+}
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #555);
+  margin: 0 0 4px;
+}
+.panel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.panel-row label {
+  font-size: 12px;
+  color: var(--text-secondary, #999);
+  display: flex;
+  justify-content: space-between;
+}
+.panel-meta {
+  font-size: 11px;
+  color: var(--text-muted, #555);
+  font-family: var(--font-mono, monospace);
+}
+.panel-hint {
+  font-size: 11px;
+  color: var(--text-muted, #555);
+  line-height: 1.5;
+  margin: 0;
+}
+.editor-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border, #2a2a2a);
+  outline: none;
+  cursor: pointer;
+}
+.editor-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent, #ff3040);
+  cursor: pointer;
+}
+.editor-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent, #ff3040);
+  cursor: pointer;
+  border: none;
+}
+.editor-color-input {
+  width: 40px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 6px;
+  background: var(--bg-surface, #111);
+  cursor: pointer;
+}
+.editor-text-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 8px;
+  color: var(--text-primary, #fff);
+  font-size: 13px;
+  font-family: var(--font-body, sans-serif);
+  box-sizing: border-box;
+}
+.editor-number-input {
+  width: 80px;
+  padding: 5px 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 8px;
+  color: var(--text-primary, #fff);
+  font-size: 13px;
+  font-family: var(--font-mono, monospace);
+}
+.editor-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 8px;
+  color: var(--text-primary, #fff);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.editor-add-btn:hover { background: rgba(255,255,255,0.1); }
+.editor-danger-btn {
+  border-color: rgba(255,48,64,0.4);
+  color: var(--accent, #ff3040);
+}
+.editor-danger-btn:hover { background: rgba(255,48,64,0.1); }
+.editor-overlay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+.editor-overlay-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary, #999);
+}
+.editor-overlay-item button {
+  background: none;
+  border: none;
+  color: var(--accent, #ff3040);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 11px;
+  line-height: 1;
+}
+.speed-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.speed-preset-btn {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #2a2a2a);
+  background: none;
+  color: var(--text-secondary, #999);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.speed-preset-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary, #fff);
+}
+.speed-preset-btn.active {
+  background: var(--accent, #ff3040);
+  border-color: var(--accent, #ff3040);
+  color: #fff;
+}
+
+/* Preview Area */
+.editor-preview-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  min-width: 0;
+}
+.editor-video-wrap {
+  position: relative;
+  flex: 1;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editor-video-wrap video {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+.editor-video-wrap canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.editor-video-wrap canvas.draw-active {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+/* Playback controls */
+.editor-playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.editor-play-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary, #fff);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.editor-play-btn:hover { background: rgba(255,255,255,0.14); }
+.editor-timeline {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border, #2a2a2a);
+  outline: none;
+  cursor: pointer;
+}
+.editor-timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent, #ff3040);
+  cursor: pointer;
+}
+.editor-time-display {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-secondary, #999);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border, #2a2a2a);
+  gap: 12px;
+  flex-shrink: 0;
+}
+.editor-footer-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+.editor-progress-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.editor-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border, #2a2a2a);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.editor-progress-fill {
+  height: 100%;
+  background: var(--accent, #ff3040);
+  width: 0%;
+  transition: width 0.3s;
+  border-radius: 2px;
+}
+.editor-progress-label {
+  font-size: 12px;
+  color: var(--text-secondary, #999);
+  font-family: var(--font-mono, monospace);
+  white-space: nowrap;
+}

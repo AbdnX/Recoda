@@ -13,6 +13,7 @@ import { initWebcamDrag } from './webcam.js';
 import { initMeters } from './meters.js';
 import { initRecorder } from './recorder.js';
 import { initKeyboardShortcuts } from './keyboard.js';
+import { initEditor } from './editor.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize in order
@@ -23,6 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initRecorder();
   initKeyboardShortcuts();
   
+  initEditor();
+
   // Auth & Cloud (async)
   await initAuth();
   await initRecordings();

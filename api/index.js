@@ -104,6 +104,11 @@ const upload = multer({
 });
 
 // Middleware
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  next();
+});
 app.use(cors({
   origin(origin, callback) {
     // Allow requests without origin (curl/health checks/server-to-server).

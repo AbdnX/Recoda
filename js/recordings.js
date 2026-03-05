@@ -10,6 +10,7 @@ import { showToast } from './toast.js';
 import { saveRecording, loadAllRecordings, deleteRecording as dbDelete, updateRecording as dbUpdate } from './storage.js';
 import { getSupabase } from './supabase.js';
 import { updateSyncButton } from './cloud.js';
+import { openEditor } from './editor.js';
 
 const recordings = [];
 let dlTarget = null;        // recording object currently in the modal
@@ -639,6 +640,7 @@ export function renderRecordings() {
       </div>
       <div class="rec-actions">
         <button class="btn-ghost-sm btn-play-rec" data-i="${i}" title="Play"><i data-lucide="play" style="width:14px;height:14px;"></i></button>
+        <button class="btn-ghost-sm btn-edit-rec" data-i="${i}" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
         ${window.location.hostname === 'localhost' ? `<button class="btn-ghost-sm btn-local-rec" data-i="${i}" title="Save to local library"><i data-lucide="hard-drive" style="width:14px;height:14px;"></i></button>` : ''}
         <button class="btn-ghost-sm btn-dl-rec" data-i="${i}" title="Download"><i data-lucide="download" style="width:14px;height:14px;"></i></button>
         <button class="btn-ghost-sm btn-del-rec" data-i="${i}" title="Delete" style="color:var(--accent);"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
@@ -807,14 +809,19 @@ function setupListeners() {
 
   if (recList) {
     recList.addEventListener('click', (e) => {
-      const pb = e.target.closest('.btn-play-rec');
-      const dl = e.target.closest('.btn-dl-rec');
+      const pb  = e.target.closest('.btn-play-rec');
+      const ed  = e.target.closest('.btn-edit-rec');
+      const dl  = e.target.closest('.btn-dl-rec');
       const loc = e.target.closest('.btn-local-rec');
       const del = e.target.closest('.btn-del-rec');
 
       if (pb) {
         const r = recordings[parseInt(pb.dataset.i)];
         if (r) playRecording(r);
+      }
+      if (ed) {
+        const r = recordings[parseInt(ed.dataset.i)];
+        if (r) openEditor(r);
       }
       if (dl) {
         const r = recordings[parseInt(dl.dataset.i)];
