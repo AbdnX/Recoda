@@ -7,7 +7,7 @@
 import { $ } from './utils.js';
 import { formatTime, formatSize, escapeHtml } from './utils.js';
 import { showToast } from './toast.js';
-import { saveRecording, loadAllRecordings, deleteRecording as dbDelete, updateRecording as dbUpdate } from './storage.js';
+import { saveRecording, loadAllRecordings, deleteRecording as dbDelete, updateRecording as dbUpdate, setStorageUser } from './storage.js';
 import { getSupabase } from './supabase.js';
 import { updateSyncButton } from './cloud.js';
 
@@ -766,6 +766,12 @@ export async function playRecording(r) {
 
 /** Initialize: load persisted recordings, set up click handlers and modal */
 export async function initRecordings() {
+  try {
+    const sb = await getSupabase();
+    const { data: { session } } = await sb.auth.getSession();
+    setStorageUser(session?.user?.id ?? null);
+  } catch (_) {}
+
   try {
     const saved = await loadAllRecordings();
     if (saved.length > 0) recordings.push(...saved);

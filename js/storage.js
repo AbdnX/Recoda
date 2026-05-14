@@ -3,11 +3,22 @@
  * Stores video blobs locally in the browser — no backend needed.
  */
 
-const DB_NAME = 'recoda-db';
 const DB_VERSION = 1;
 const STORE_NAME = 'recordings';
 
 let db = null;
+let currentUserId = null;
+
+export function setStorageUser(userId) {
+  if (userId !== currentUserId) {
+    if (db) { db.close(); db = null; }
+    currentUserId = userId;
+  }
+}
+
+function getDbName() {
+  return currentUserId ? `recoda-db-${currentUserId}` : 'recoda-db-anonymous';
+}
 
 /**
  * Open (or create) the IndexedDB database.
@@ -17,7 +28,7 @@ function openDB() {
   if (db) return Promise.resolve(db);
 
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(getDbName(), DB_VERSION);
 
     request.onupgradeneeded = (e) => {
       const database = e.target.result;
